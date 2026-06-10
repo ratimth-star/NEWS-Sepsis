@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description"
+    content="PWA สำหรับประเมิน National Early Warning Score (NEWS) พร้อมบันทึกประวัติออฟไลน์ และรองรับมือถือ" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Golden Jubilee Medical Center</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Prompt:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css?v=20260610-readable-type-cache-fix" />
+</head>
+
+<body>
+  <svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true" focusable="false">
+    <symbol id="sp-shield" viewBox="0 0 24 24">
+      <path d="M12 2l7 3v6c0 5-3.4 9.2-7 11-3.6-1.8-7-6-7-11V5l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M12 7v8M8 11h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-shield-check" viewBox="0 0 24 24">
+      <path d="M12 2l7 3v6c0 5-3.4 9.2-7 11-3.6-1.8-7-6-7-11V5l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8.8 11.8l2.1 2.1 4.3-4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-shield-heart" viewBox="0 0 24 24">
+      <path d="M12 2l7 3v6c0 5-3.4 9.2-7 11-3.6-1.8-7-6-7-11V5l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M9.4 11.5h1.4l1-1.8 1.3 3 1-1.2h1.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M5 20c1.8-3.4 4.2-5 7-5s5.2 1.6 7 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-home-solid" viewBox="0 0 24 24">
+      <path d="M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-5v-6H10v6H5a1 1 0 01-1-1v-9.5z" fill="currentColor"/>
+    </symbol>
+    <symbol id="sp-document" viewBox="0 0 24 24">
+      <path d="M8 3h6l5 5v12a1 1 0 01-1 1H8a2 2 0 01-2-2V5a2 2 0 012-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M14 3v6h5M9 12h6M9 15.5h6M9 19h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-sync" viewBox="0 0 24 24">
+      <path d="M20 7v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 17v-5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 9a7 7 0 0111-2M17 15A7 7 0 016 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-run" viewBox="0 0 24 24">
+      <circle cx="15" cy="4.5" r="2" fill="currentColor"/>
+      <path d="M10 20l2.5-5 2-2-2.5-2.5-2.5 1.5M12 8l3 1 2.5 3M7 14l3-2M9 9l2.5-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-house" viewBox="0 0 24 24">
+      <path d="M4 11l8-6 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 10.5V20h12v-9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M12 10v6M9 13h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-pin" viewBox="0 0 24 24">
+      <path d="M12 21s6-5.1 6-11a6 6 0 10-12 0c0 5.9 6 11 6 11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    </symbol>
+    <symbol id="sp-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="16" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M4.5 19c.9-2.7 2.7-4 4.5-4s3.6 1.3 4.5 4M11.5 19c.8-2.3 2.3-3.4 4.1-3.4 1.7 0 3.2 1.1 3.9 3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-lungs" viewBox="0 0 24 24">
+      <path d="M12 3.8v6.1" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+      <path d="M10.9 9.7c-.8-2.5-2-3.8-3.5-3.8-2.1 0-3.8 2.8-3.8 6.2 0 4 2.1 7 5 7 1.9 0 3.3-1.2 3.9-3.1l.2-2.2c0-1.2-.6-2.6-1.8-4.1z" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round"/>
+      <path d="M13.1 9.7c.8-2.5 2-3.8 3.5-3.8 2.1 0 3.8 2.8 3.8 6.2 0 4-2.1 7-5 7-1.9 0-3.3-1.2-3.9-3.1l-.2-2.2c0-1.2.6-2.6 1.8-4.1z" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round"/>
+      <path d="M7.8 13.6c1 .3 1.8.9 2.3 1.9M16.2 13.6c-1 .3-1.8.9-2.3 1.9" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-kidney" viewBox="0 0 24 24">
+      <path d="M9.2 5.2c-2.6 0-4.6 2.5-4.6 5.9 0 3.7 1.9 6.6 4.5 6.6 2.1 0 3.6-1.6 3.6-4V9.2c0-2.2-1.5-4-3.5-4z" fill="currentColor"/>
+      <path d="M15.1 5.2c2 0 3.6 1.8 3.6 4v4.5c0 2.4-1.5 4-3.6 4-2.6 0-4.5-2.9-4.5-6.6 0-3.4 2-5.9 4.5-5.9z" fill="currentColor"/>
+      <path d="M12 8.8v6.5" fill="none" stroke="white" stroke-width="1.35" stroke-linecap="round"/>
+      <path d="M10.7 10.8c.8.4 1.3 1.1 1.3 2M13.3 10.8c-.8.4-1.3 1.1-1.3 2" fill="none" stroke="white" stroke-width="1.1" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-gut" viewBox="0 0 24 24">
+      <path d="M7.2 5.4h9.6" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>
+      <path d="M8.2 5.4c-1.8 0-3.1 1.3-3.1 3v1.1c0 1.2.7 2.2 1.8 2.8-1.1.6-1.8 1.7-1.8 2.9v1c0 1.7 1.3 3.1 3.1 3.1" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.8 5.4c1.8 0 3.1 1.3 3.1 3v1.1c0 1.2-.7 2.2-1.8 2.8 1.1.6 1.8 1.7 1.8 2.9v1c0 1.7-1.3 3.1-3.1 3.1" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10 5.8v4c0 1.3 1 2.2 2.3 2.2h1.2c1.2 0 2.2 1 2.2 2.2v4.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M14.1 5.8v1.7c0 1.1-.9 1.9-1.9 1.9h-.8c-1 0-1.8.8-1.8 1.8v1c0 1 .8 1.8 1.8 1.8h1c1 0 1.8.8 1.8 1.8v2.8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-skin" viewBox="0 0 24 24">
+      <path d="M4.5 8.1h15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M4.5 12h15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M4.5 15.9h15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M7 5.9c.9.9.9 2.4 0 3.3M10.7 9.8c.9.9.9 2.4 0 3.3M14.3 6.5c.9.9.9 2.4 0 3.3M17.8 10.3c.9.9.9 2.4 0 3.3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-question" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M9.3 9.1c.2-1.8 1.7-3 3.6-3 2 0 3.6 1.3 3.6 3.1 0 1.1-.5 1.9-1.5 2.6l-1.2.8c-.7.5-1 1-1 1.8v.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="17.3" r="1.1" fill="currentColor"/>
+    </symbol>
+    <symbol id="sp-dots" viewBox="0 0 24 24">
+      <circle cx="6" cy="12" r="1.7" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.7" fill="currentColor"/>
+      <circle cx="18" cy="12" r="1.7" fill="currentColor"/>
+    </symbol>
+    <symbol id="sp-vial" viewBox="0 0 24 24">
+      <path d="M10 3h4M11 3v5l-4.5 6.5a4 4 0 003.3 6.5h4.4a4 4 0 003.3-6.5L13 8V3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.5 14h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-clipboard-alert" viewBox="0 0 24 24">
+      <path d="M9 4h6l1 2h2a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h2l1-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M9 11h6M9 14h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M18.2 16.2l2.6 4.3h-5.2l2.6-4.3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M18.2 17.4v1.2M18.2 19.8h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-bag" viewBox="0 0 24 24">
+      <rect x="8" y="4" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M12 7v6M9 10h6M10 14l-2 5M14 14l2 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-pill" viewBox="0 0 24 24">
+      <path d="M8 6a4 4 0 015.7 0l4.3 4.3a4 4 0 01-5.7 5.7L8 11.7A4 4 0 018 6z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M9.5 8.5l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sp-heart" viewBox="0 0 24 24">
+      <path d="M12 20s-7-4.7-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.3-7 10-7 10z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8 12h2l1-2 2 4 1-2h2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-monitor" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="16" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M8 19h8M12 15v4M6.5 10.5h2l1-2 2 4 1-2h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-bed" viewBox="0 0 24 24">
+      <path d="M3 18V7M3 14h18v4M7 14V9h4a3 3 0 013 3v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sp-ambulance" viewBox="0 0 24 24">
+      <path d="M3 16V9h10v7M13 10h4l3 3v3h-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8 12h2M9 11v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="7" cy="17" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <circle cx="18" cy="17" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    </symbol>
+  </svg>
+  <div class="global-language-toggle" role="group" aria-label="Language">
+    <button class="active" type="button" data-language="th">ไทย</button>
+    <button type="button" data-language="en">EN</button>
+  </div>
+  <div class="page-gradient min-vh-100">
+    <div class="container-fluid container-xxl py-3 py-md-4">
+      <header class="card border-0 shadow-lg overflow-hidden hero-card mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+          <div class="hero-actions">
+            <div class="d-grid d-sm-flex justify-content-lg-end gap-2">
+              <div class="btn-group lang-toggle" role="group" aria-label="Language switcher">
+                <button id="langThBtn" class="btn btn-outline-light" type="button">ไทย</button>
+                <button id="langEnBtn" class="btn btn-outline-light" type="button">English</button>
+              </div>
+              <button id="installBtn" class="btn btn-outline-light d-none" type="button">ติดตั้งแอป</button>
+              <button id="resetBtnTop" class="btn btn-soft" type="button">รีเซ็ตทั้งหมด</button>
+            </div>
+          </div>
+
+          <div class="row g-3 align-items-center">
+            <div class="col-lg-12">
+              <div class="d-flex flex-column gap-2">
+                <div>
+                  <div class="hero-title-wrap">
+                    <img class="hero-logo" src="icons/GJMC_logo.png" alt="Golden Jubilee Medical Center logo" />
+                    <div class="hero-copy">
+                      <h1 class="display-6 fw-bold mb-1 text-white">Golden Jubilee Medical Center</h1>
+                      <p class="hero-subtitle mb-0 text-secondary-light">
+                        <span id="heroSubtitleLine1" class="d-block">NEWS</span>
+                        <span id="heroSubtitleLine2" class="d-block">National Early Warning Score</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="desktop-showcase" aria-label="Desktop dashboard showcase" hidden>
+        <div class="desktop-app-shell">
+          <aside class="desktop-sidebar">
+            <div class="desktop-brand">
+              <img src="icons/GJMC_logo.png" alt="logo" class="desktop-brand-logo" />
+              <div class="desktop-brand-copy">
+                <h2>SMART SEPSIS NEWS APP</h2>
+                <p>รู้ทัน เช็กไว เตือนภัย SEPSIS</p>
+              </div>
+            </div>
+
+            <nav class="desktop-side-nav" aria-label="Desktop menu">
+              <a class="desktop-side-item active" href="#"><span>⌂</span><span>หน้าหลัก</span></a>
+              <a class="desktop-side-item" href="#"><span>🗂</span><span>ประวัติ</span></a>
+              <a class="desktop-side-item has-badge" href="#"><span>🔔</span><span>แจ้งเตือน</span><em>7</em></a>
+              <a class="desktop-side-item has-badge" href="#"><span>🩺</span><span>ประเมิน NEWS</span><em>1</em></a>
+              <a class="desktop-side-item" href="#"><span>◔</span><span>Dashboard สรุปผล</span></a>
+              <a class="desktop-side-item" href="#"><span>🧪</span><span>Sepsis Protocol</span></a>
+              <a class="desktop-side-item" href="#"><span>🗒</span><span>บันทึกข้อมูลผู้ป่วย</span></a>
+              <a class="desktop-side-item" href="#"><span>📖</span><span>ความรู้ & แนวทางการดูแล Sepsis</span></a>
+              <a class="desktop-side-item" href="#"><span>🧾</span><span>เอกสาร / แบบฟอร์มที่เกี่ยวข้อง</span></a>
+              <a class="desktop-side-item" href="#"><span>⚙</span><span>ตั้งค่า</span></a>
+            </nav>
+
+            <a class="desktop-signout" href="#"><span>⇱</span><span>ออกจากระบบ</span></a>
+          </aside>
+
+          <main class="desktop-main">
+            <header class="desktop-topbar">
+              <div class="desktop-topbar-left">
+                <button class="desktop-icon-btn" type="button">☰</button>
+                <h1>หน้าหลัก</h1>
+              </div>
+              <div class="desktop-topbar-right">
+                <button class="desktop-icon-btn desktop-notify" type="button">🔔<em>7</em></button>
+                <div class="desktop-user-chip">
+                  <div class="desktop-avatar"></div>
+                  <div></div>
+                </div>
+              </div>
+            </header>
+
+            <section class="desktop-kpi-grid">
+              <article class="desktop-kpi-card desktop-kpi-primary">
+                <div class="desktop-kpi-main">
+                  <div class="desktop-mini-gauge">
+                    <div class="desktop-mini-gauge-arc"></div>
+                    <div class="desktop-mini-gauge-score">
+                      <strong>14</strong>
+                      <span>คะแนน</span>
+                    </div>
+                  </div>
+                  <div class="desktop-kpi-alert">
+                    <strong>เสี่ยงสูง</strong>
+                    <span>ต้องรีบแจ้งแพทย์</span>
+                    <small>26 เม.ย. 2569 09:41 น.</small>
+                  </div>
+                </div>
+                <div class="desktop-kpi-link">ดูประวัติการประเมิน →</div>
+              </article>
+
+              <article class="desktop-kpi-card">
+                <h3>ผู้ป่วย NEWS &gt; 7</h3>
+                <strong class="desktop-kpi-number red">45</strong>
+                <span>ราย</span>
+                <small>อัปเดตล่าสุด 09:41 น.</small>
+              </article>
+
+              <article class="desktop-kpi-card">
+                <h3>ประเมินอาการและติดตามสัญญาณชีพ</h3>
+                <strong class="desktop-kpi-number orange">3</strong>
+                <span>ราย</span>
+                <small>อัปเดตล่าสุด 10:41 น.</small>
+              </article>
+
+              <article class="desktop-kpi-card">
+                <h3>รอผลตรวจ / การตอบสนอง</h3>
+                <strong class="desktop-kpi-number teal">8</strong>
+                <span>รายการ</span>
+                <small>อัปเดตล่าสุด 09:50 น.</small>
+              </article>
+            </section>
+
+            <section class="desktop-panel-grid desktop-panel-grid-top">
+              <article class="desktop-panel">
+                <div class="desktop-panel-head">
+                  <h3>1. ประเมิน NEWS ล่าสุด</h3>
+                </div>
+                <div class="desktop-score-list">
+                  <div class="desktop-score-row"><span>อัตราการหายใจ (ครั้ง/นาที)</span><strong>24</strong><em>3</em></div>
+                  <div class="desktop-score-row"><span>O₂ Saturation (%)</span><strong>90</strong><em>2</em></div>
+                  <div class="desktop-score-row"><span>ใช้ออกซิเจนเสริม (LPM)</span><strong>2</strong><em>2</em></div>
+                  <div class="desktop-score-row"><span>อุณหภูมิ (°C)</span><strong>38.3</strong><em>1</em></div>
+                  <div class="desktop-score-row"><span>ความดันโลหิตตัวบน (mmHg)</span><strong>100</strong><em>1</em></div>
+                  <div class="desktop-score-row"><span>ชีพจร (ครั้ง/นาที)</span><strong>110</strong><em>2</em></div>
+                  <div class="desktop-score-row"><span>ระดับความรู้สึกตัว (ACVPU)</span><strong>V</strong><em>3</em></div>
+                </div>
+                <button class="desktop-primary-btn" type="button">ประเมิน NEWS ใหม่</button>
+              </article>
+
+              <article class="desktop-panel">
+                <div class="desktop-panel-head">
+                  <h3>2. ผู้ป่วยที่ประเมิน sepsis protocol ล่าสุด</h3>
+                  <div class="desktop-pill-row">
+                    <span class="desktop-pill active">ทั้งหมด</span>
+                    <span class="desktop-pill">NEWS ≥ 7</span>
+                    <span class="desktop-pill">เฝ้าระวัง</span>
+                    <span class="desktop-pill">ปกติ</span>
+                  </div>
+                </div>
+                <div class="desktop-patient-list">
+                  <div class="desktop-patient-row"><strong>HN 1234567 นายสมชาย ใจดี</strong><span>09:41</span><em class="risk-high">NEWS 14</em></div>
+                  <div class="desktop-patient-row"><strong>HN 1234568 นางสาวกมลชนก</strong><span>08:30</span><em class="risk-mid">NEWS 8</em></div>
+                  <div class="desktop-patient-row"><strong>HN 1234569 นายธีรชัย รักดี</strong><span>07:15</span><em class="risk-watch">NEWS 5</em></div>
+                  <div class="desktop-patient-row"><strong>HN 1234570 นางบุญมี แก้วใส</strong><span>06:20</span><em class="risk-low">NEWS 2</em></div>
+                </div>
+                <div class="desktop-panel-link">ดูทั้งหมด →</div>
+              </article>
+
+              <article class="desktop-panel desktop-chart-panel">
+                <div class="desktop-panel-head">
+                  <h3>3. กราฟแนวโน้มคะแนน NEWS</h3>
+                  <span class="desktop-select">7 วันล่าสุด ▾</span>
+                </div>
+                <div class="desktop-line-chart">
+                  <div class="desktop-line-grid"></div>
+                  <div class="desktop-line">
+                    <span class="p1">3</span>
+                    <span class="p2">4</span>
+                    <span class="p3">7</span>
+                    <span class="p4">9</span>
+                    <span class="p5">11</span>
+                    <span class="p6">13</span>
+                    <span class="p7">14</span>
+                  </div>
+                </div>
+                <div class="desktop-risk-legend">
+                  <span class="risk-low">0-4 เสี่ยงต่ำ</span>
+                  <span class="risk-watch">5-6 เฝ้าระวัง</span>
+                  <span class="risk-mid">7-12 เสี่ยงปานกลาง</span>
+                  <span class="risk-high">≥ 13 เสี่ยงสูง</span>
+                </div>
+              </article>
+            </section>
+
+            <section class="desktop-panel-grid desktop-panel-grid-bottom">
+              <article class="desktop-panel">
+                <div class="desktop-panel-head">
+                  <h3>4. แจ้งเตือนล่าสุด</h3>
+                </div>
+                <div class="desktop-alert-list">
+                  <div class="desktop-alert-row"><strong>ผู้ป่วย NEWS ≥ 7: HN 1234567 นายสมชาย ใจดี</strong><span>09:41</span></div>
+                  <div class="desktop-alert-row"><strong>ยังไม่ได้ให้ ATB ภายใน 1 ชม.: HN 1234568 นางสาวกมลชนก</strong><span>09:35</span></div>
+                  <div class="desktop-alert-row"><strong>ประเมินอาการและติดตามสัญญาณชีพ: HN 1234567 นายสมชาย ใจดี</strong><span>10:41</span></div>
+                </div>
+                <div class="desktop-panel-link">ดูทั้งหมด →</div>
+              </article>
+
+              <article class="desktop-panel">
+                <div class="desktop-panel-head">
+                  <h3>5. Sepsis 6 ภายใน 1 ชั่วโมง</h3>
+                </div>
+                <div class="desktop-protocol-list">
+                  <div class="desktop-protocol-row done"><span>แจ้งแพทย์ (Time Zero)</span><strong>09:41</strong></div>
+                  <div class="desktop-protocol-row done"><span>เจาะเลือดเพาะเชื้อ (Hemoculture)</span><strong>09:45</strong></div>
+                  <div class="desktop-protocol-row done"><span>ตรวจ Lactate</span><strong>09:50</strong></div>
+                  <div class="desktop-protocol-row done"><span>ให้สารน้ำ (IV fluid) 30 ml/kg</span><strong>10:00</strong></div>
+                  <div class="desktop-protocol-row pending"><span>ให้ยาปฏิชีวนะ (ATB)</span><strong>10:15</strong></div>
+                  <div class="desktop-protocol-row pending"><span>ประเมินอาการและติดตามสัญญาณชีพ</span><strong>-</strong></div>
+                </div>
+                <div class="desktop-panel-link">ดูแผน Sepsis Protocol →</div>
+              </article>
+
+              <article class="desktop-panel">
+                <div class="desktop-panel-head">
+                  <h3>6. ความรู้ & แนวทางการดูแล Sepsis</h3>
+                </div>
+                <div class="desktop-resource-list">
+                  <div class="desktop-resource-row"><span>แนวทางการดูแล Sepsis</span><em>›</em></div>
+                  <div class="desktop-resource-row"><span>การให้สารน้ำในผู้ป่วย Sepsis</span><em>›</em></div>
+                  <div class="desktop-resource-row"><span>การใช้ยาปฏิชีวนะเบื้องต้น</span><em>›</em></div>
+                  <div class="desktop-resource-row"><span>การติดตามสัญญาณชีพ</span><em>›</em></div>
+                  <div class="desktop-resource-row"><span>เอกสาร / แบบฟอร์มที่เกี่ยวข้อง</span><em>›</em></div>
+                </div>
+                <div class="desktop-panel-link">ดูทั้งหมด →</div>
+              </article>
+            </section>
+
+            <footer class="desktop-footer">
+              <span>© 2025 SMART SEPSIS NEWS APP</span>
+              <span>คณะพยาบาลศาสตร์</span>
+              <span>เวอร์ชัน 1.0.0</span>
+            </footer>
+          </main>
+        </div>
+      </section>
+
+      <div class="desktop-layout-shell">
+        <aside class="desktop-app-sidebar" aria-label="Desktop main navigation">
+          <div class="desktop-app-brand">
+            <img src="icons/GJMC_logo.png" alt="SMART SEPSIS logo" class="desktop-app-brand-logo" />
+            <div>
+              <h2>SMART SEPSIS NEWS APP</h2>
+              <p>รู้ทัน เช็กไว เตือนภัย SEPSIS</p>
+            </div>
+          </div>
+
+          <nav class="desktop-app-nav">
+            <button class="desktop-app-nav-item active" type="button" data-app-view="home">
+              <span class="desktop-app-nav-icon" aria-hidden="true"><img src="icon sepsis/ปุ่มhome.svg" alt="" /></span>
+              <span>หน้าหลัก</span>
+            </button>
+            <button class="desktop-app-nav-item" type="button" data-app-view="assessment">
+              <span class="desktop-app-nav-icon" aria-hidden="true"><img src="icon sepsis/ประเมินNEWS.svg" alt="" /></span>
+              <span>ประเมิน NEWS</span>
+            </button>
+            <button class="desktop-app-nav-item" type="button" data-app-view="sepsis">
+              <span class="desktop-app-nav-icon" aria-hidden="true"><img src="icon sepsis/Sepsis protocol.svg" alt="" /></span>
+              <span>Sepsis Protocol</span>
+            </button>
+            <button class="desktop-app-nav-item" type="button" data-app-view="history">
+              <span class="desktop-app-nav-icon" aria-hidden="true"><img src="icon sepsis/history.svg" alt="" /></span>
+              <span>ประวัติ</span>
+            </button>
+            <button class="desktop-app-nav-item" type="button" data-app-view="dashboard">
+              <span class="desktop-app-nav-icon" aria-hidden="true"><img src="icon sepsis/Dashbroad.svg" alt="" /></span>
+              <span>Dashboard สรุปผล</span>
+            </button>
+            <button class="desktop-app-nav-item" type="button" data-app-view="knowledge">
+              <span class="desktop-app-nav-icon" aria-hidden="true"><img src="icon sepsis/ความรู้&แนวทางการดูแลsepsis.svg" alt="" /></span>
+              <span>Knowledge</span>
+            </button>
+          </nav>
+          <div class="desktop-language-toggle" role="group" aria-label="Language">
+            <button class="active" type="button" data-language="th">ไทย</button>
+            <button type="button" data-language="en">EN</button>
+          </div>
+        </aside>
+
+        <div class="desktop-layout-content">
+          <header id="desktopAppTopbar" class="desktop-app-topbar" hidden>
+            <div class="desktop-app-topbar-left">
+              <div>
+                <h1 id="desktopViewTitle">หน้าหลัก</h1>
+                <p id="desktopViewSubtitle">เลือกส่วนที่ต้องการใช้งานจากเมนูด้านซ้าย</p>
+              </div>
+            </div>
+          </header>
+
+      <section id="homeView" class="app-view app-view-active" data-view-panel="home">
+        <div class="home-app-screen">
+          <section class="home-smart-hero" aria-labelledby="homeSmartTitle">
+            <div class="home-smart-hero-top">
+              <div class="home-language-toggle" role="group" aria-label="Language">
+                <button class="active" type="button" data-language="th">ไทย</button>
+                <button type="button" data-language="en">EN</button>
+              </div>
+            </div>
+            <div class="home-smart-brand">
+              <span class="home-smart-shield" aria-hidden="true"><img src="icons/GJMC_logo.png" alt="" /></span>
+              <div>
+                <h1 id="homeSmartTitle">Smart sepsis app</h1>
+                <p>รู้ทัน เช็คไว เตือนภัย SEPSIS</p>
+              </div>
+            </div>
+            <div class="home-smart-clinician" aria-hidden="true">
+              <img src="icon sepsis/doctor-notify.svg" alt="" />
+            </div>
+          </section>
+
+          <section class="home-welcome-card" aria-label="ยินดีต้อนรับ">
+            <div class="home-nurse-portrait" aria-hidden="true">
+              <img src="icon sepsis/Smart Sepsis App 2.svg" alt="" />
+            </div>
+            <div class="home-welcome-copy">
+              <h2>ยินดีต้อนรับเข้าสู่ระบบ</h2>
+              <strong>รู้ทัน เช็คไว เตือนภัย SEPSIS</strong>
+            </div>
+            <div class="home-clock-card">
+              <div><strong id="homeClockTime">--:--</strong></div>
+              <small id="homeClockDate">วันนี้</small>
+            </div>
+          </section>
+
+          <nav class="home-smart-menu-grid" aria-label="เมนูหลักหน้าแรก">
+            <button class="home-smart-menu-card" type="button" data-nav-view="assessment">
+              <span class="home-smart-menu-icon"><img src="icon sepsis/ประเมินNEWS.svg" alt="" /></span>
+              <strong>ประเมิน NEWS</strong>
+            </button>
+            <button class="home-smart-menu-card" type="button" data-nav-view="dashboard">
+              <span class="home-smart-menu-icon"><img src="icon sepsis/Dashbroad.svg" alt="" /></span>
+              <strong>Dashboard</strong>
+              <small>สรุปผล</small>
+            </button>
+            <button class="home-smart-menu-card" type="button" data-nav-view="sepsis">
+              <span class="home-smart-menu-icon"><img src="icon sepsis/Sepsis protocol.svg" alt="" /></span>
+              <strong>Sepsis</strong>
+              <small>Protocol</small>
+            </button>
+            <button class="home-smart-menu-card" type="button" data-nav-view="knowledge">
+              <span class="home-smart-menu-icon"><img src="icon sepsis/ความรู้&แนวทางการดูแลsepsis.svg" alt="" /></span>
+              <strong>ความรู้ & แนวทาง</strong>
+              <small>การดูแล Sepsis</small>
+            </button>
+            <button class="home-smart-menu-card" type="button" data-nav-view="evaluation">
+              <span class="home-smart-menu-icon"><img src="icon sepsis/ปุ่มiconประวัติ.svg" alt="" /></span>
+              <strong>ประเมิน Smart Sepsis App</strong>
+            </button>
+          </nav>
+
+          <section class="home-follow-panel" aria-labelledby="homeFollowTitle">
+            <div class="home-follow-head">
+              <div>
+                <span class="home-follow-icon" aria-hidden="true"><img src="icon sepsis/ผู้ป่วยที่ประเมิน sepsis protocol ล่าสุด.svg" alt="" /></span>
+                <h2 id="homeFollowTitle">ผู้ป่วยที่ประเมิน sepsis protocol ล่าสุด</h2>
+              </div>
+              <button type="button" data-nav-view="history">ดูทั้งหมด <span aria-hidden="true">→</span></button>
+            </div>
+            <div id="homeSepsisCaseList" class="home-patient-list" aria-live="polite"></div>
+          </section>
+
+          <section class="home-sepsis-cta" aria-label="พบผู้ป่วยสงสัย Sepsis">
+            <div>
+              <span aria-hidden="true"><img src="icon sepsis/พบผู้ป่วยสงสัย sepsis.svg" alt="" /></span>
+              <div>
+                <h2>พบผู้ป่วยสงสัย Sepsis</h2>
+                <p>ประเมิน NEWS ทันที เพื่อลดความเสี่ยงและเพิ่มความปลอดภัยของผู้ป่วย</p>
+              </div>
+            </div>
+            <button type="button" data-nav-view="assessment">เริ่มประเมินทันที <span aria-hidden="true">›</span></button>
+          </section>
+        </div>
+      </section>
+
+      <section id="assessmentView" class="app-view" data-view-panel="assessment" hidden>
+      <div class="row g-3 g-lg-4 align-items-start">
+        <div class="col-12 col-lg-8">
+          <section id="assessmentCard" class="card app-card border-0 shadow-sm mb-3">
+            <div class="card-body p-3 p-md-4">
+              <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+                <div>
+                  <h2 id="assessmentSectionTitle" class="h4 mb-1 text-white">&#xE02;&#xE49;&#xE2D;&#xE21;&#xE39;&#xE25;&#xE01;&#xE32;&#xE23;&#xE1B;&#xE23;&#xE30;&#xE40;&#xE21;&#xE34;&#xE19;</h2>
+                  <p id="assessmentSectionSubtitle" class="text-muted-custom mb-0">&#xE01;&#xE23;&#xE2D;&#xE01;&#xE02;&#xE49;&#xE2D;&#xE21;&#xE39;&#xE25;&#xE1E;&#xE37;&#xE49;&#xE19;&#xE10;&#xE32;&#xE19;&#xE01;&#xE48;&#xE2D;&#xE19;&#xE1A;&#xE31;&#xE19;&#xE17;&#xE36;&#xE01;&#xE04;&#xE30;&#xE41;&#xE19;&#xE19;</p>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label id="assessmentTimeLabel" for="assessmentTime" class="form-label">&#xE27;&#xE31;&#xE19;&#xE1B;&#xE23;&#xE30;&#xE40;&#xE21;&#xE34;&#xE19;</label>
+                  <input id="assessmentTime" class="form-control form-control-lg custom-control"
+                    type="datetime-local" />
+                </div>
+                <div class="col-12">
+                  <label id="locationLabel" class="form-label">&#xE2A;&#xE16;&#xE32;&#xE19;&#xE17;&#xE35;&#xE48;&#xE1B;&#xE23;&#xE30;&#xE40;&#xE21;&#xE34;&#xE19;</label>
+                  <input id="location" type="hidden" value="" />
+                  <div class="location-button-grid" role="group" aria-label="&#xE2A;&#xE16;&#xE32;&#xE19;&#xE17;&#xE35;&#xE48;&#xE1B;&#xE23;&#xE30;&#xE40;&#xE21;&#xE34;&#xE19;">
+                    <button type="button" class="btn location-option" data-location="OPD">OPD</button>
+                    <button type="button" class="btn location-option" data-location="Ward">Ward</button>
+                    <button type="button" class="btn location-option" data-location="ER">ER</button>
+                    <button type="button" class="btn location-option" data-location="ICU">ICU</button>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label id="hnLabel" for="hn" class="form-label">&#xE40;&#xE25;&#xE02;&#xE17;&#xE35;&#xE48;&#xE42;&#xE23;&#xE07;&#xE1E;&#xE22;&#xE32;&#xE1A;&#xE32;&#xE25; (HN)</label>
+                  <input id="hn" class="form-control form-control-lg custom-control" type="text" inputmode="numeric"
+                    maxlength="9" pattern="[0-9]{9}" placeholder="&#xE40;&#xE0A;&#xE48;&#xE19; 123456789" />
+                </div>
+                <div class="col-12 col-md-6">
+                  <label id="genderLabel" for="gender" class="form-label">&#xE40;&#xE1E;&#xE28;</label>
+                  <select id="gender" class="form-select form-select-lg custom-control">
+                    <option value="">&#xE40;&#xE25;&#xE37;&#xE2D;&#xE01;&#xE40;&#xE1E;&#xE28;</option>
+                    <option value="male">&#xE0A;&#xE32;&#xE22;</option>
+                    <option value="female">&#xE2B;&#xE0D;&#xE34;&#xE07;</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label id="ageLabel" for="age" class="form-label">&#xE2D;&#xE32;&#xE22;&#xE38;</label>
+                  <input id="age" class="form-control form-control-lg custom-control" type="text" inputmode="numeric"
+                    maxlength="3" placeholder="&#xE40;&#xE0A;&#xE48;&#xE19; 45" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card app-card border-0 shadow-sm mb-3">
+            <div class="card-body p-3 p-md-4">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                  <h2 id="metricSectionTitle" class="h4 mb-1 text-white">ตัวชี้วัด NEWS</h2>
+                  <p id="metricSectionSubtitle" class="text-muted-custom mb-0">เลือกค่าที่ตรงกับการประเมินผู้ป่วย</p>
+                </div>
+                <span id="metricSectionHint" class="small text-muted-custom">ระบบจะคำนวณคะแนนให้อัตโนมัติ</span>
+              </div>
+
+              <div class="metric-progress-wrap mb-3">
+                <div class="metric-progress-head">
+                  <span id="metricProgressLabel" class="small text-muted-custom">Progress</span>
+                  <span id="metricProgressText" class="metric-progress-text">0/8</span>
+                </div>
+                <div class="metric-progress-track" aria-hidden="true">
+                  <div id="metricProgressFill" class="metric-progress-fill"></div>
+                </div>
+              </div>
+
+              <div class="row g-3" id="measureGrid">
+                <div class="col-12" style="order: 4;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">4</span>
+                      <h3 id="metricTitleRespiratoryRate">อัตราการหายใจ (ครั้ง/นาที)</h3>
+                    </div>
+                    <input id="respiratoryRate" class="score-input" type="hidden" value="" />
+                    <div id="respiratoryRateOptions" class="metric-option-grid"></div>
+                  </article>
+                </div>
+
+                <div class="col-12" style="order: 5;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">5</span>
+                      <h3 id="metricTitleSpo2">ความอิ่มตัวของออกซิเจนในเลือด</h3>
+                    </div>
+                    <div class="scale-group metric-scale-group mb-3" role="group" aria-label="SpO2 Scale">
+                      <input type="radio" class="btn-check spo2-scale" name="spo2Scale" id="scale1" value="1" checked>
+                      <label id="scale1Label" class="btn metric-scale-btn" for="scale1">เกณฑ์ทั่วไป</label>
+
+                      <input type="radio" class="btn-check spo2-scale" name="spo2Scale" id="scale2" value="2">
+                      <label id="scale2Label" class="btn metric-scale-btn" for="scale2">เสี่ยงภาวะหายใจล้มเหลวจาก CO2 สูง (ตัวอย่าง โรคปอดอุดกั้นเรื้อรัง COPD)</label>
+                    </div>
+                    <div class="metric-scale-panel">
+                      <div id="spo2ScaleLabel" class="metric-scale-label"></div>
+                      <input id="spo2" class="score-input" type="hidden" value="" />
+                      <div id="spo2Options" class="metric-option-grid"></div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="col-12" style="order: 7;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">7</span>
+                      <h3 id="metricTitleOxygenSupport">การใช้ออกซิเจนเสริม</h3>
+                    </div>
+                    <input id="oxygenSupport" class="score-input" type="hidden" value="" />
+                    <div id="oxygenSupportOptions" class="metric-option-grid metric-option-grid-compact"></div>
+                  </article>
+                </div>
+
+                <div class="col-12" style="order: 1;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">1</span>
+                      <h3 id="metricTitleTemperature">อุณหภูมิ</h3>
+                    </div>
+                    <input id="temperature" class="score-input" type="hidden" value="" />
+                    <div id="temperatureOptions" class="metric-option-grid"></div>
+                  </article>
+                </div>
+
+                <div class="col-12" style="order: 2;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">2</span>
+                      <h3 id="metricTitleSystolicBP">ความดันโลหิตซิสโตลิก (มม.ปรอท)</h3>
+                    </div>
+                    <input id="systolicBP" class="score-input" type="hidden" value="" />
+                    <div id="systolicBPOptions" class="metric-option-grid"></div>
+                  </article>
+                </div>
+
+                <div class="col-12" style="order: 3;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">3</span>
+                      <h3 id="metricTitleHeartRate">อัตราการเต้นของหัวใจ (ครั้ง/นาที)</h3>
+                    </div>
+                    <input id="heartRate" class="score-input" type="hidden" value="" />
+                    <div id="heartRateOptions" class="metric-option-grid"></div>
+                  </article>
+                </div>
+
+                <div class="col-12" style="order: 6;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">6</span>
+                      <h3 id="metricTitleConsciousness">ระดับความรู้สึกตัว (AVPU)</h3>
+                    </div>
+                    <input id="consciousness" class="score-input" type="hidden" value="" />
+                    <div id="consciousnessOptions" class="metric-option-grid metric-option-grid-wide"></div>
+                  </article>
+                </div>
+                <div class="col-12" style="order: 8;">
+                  <article class="metric-card h-100">
+                    <div class="metric-header">
+                      <span class="metric-number">8</span>
+                      <h3 id="metricTitleInfectionSource">&#xE1E;&#xE1A; &#xE2B;&#xE23;&#xE37;&#xE2D; &#xE2A;&#xE07;&#xE2A;&#xE31;&#xE22;&#xE41;&#xE2B;&#xE25;&#xE48;&#xE07;&#xE15;&#xE34;&#xE14;&#xE40;&#xE0A;&#xE37;&#xE49;&#xE2D; (ex. Respiratory system, urinary tract infection, intra-abdominal infection)</h3>
+                    </div>
+                    <input id="infectionSource" class="tracked-input" type="hidden" value="" />
+                    <div id="infectionSourceOptions" class="metric-option-grid metric-option-grid-compact"></div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="col-12 col-lg-4 sidebar-column">
+          <div class="sticky-panel">
+            <section id="resultPanel" class="card result-panel border-0 shadow-lg mb-3">
+              <div class="card-body p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                  <div>
+                    <h2 id="resultSectionTitle" class="h4 mb-1 text-white">ผลการประเมิน</h2>
+                    <p id="resultSectionSubtitle" class="text-muted-custom mb-0">อัปเดตแบบเรียลไทม์</p>
+                  </div>
+                  <span id="scoreStateTag" class="badge rounded-pill text-bg-secondary px-3 py-2">พร้อมประเมิน</span>
+                </div>
+
+                <div class="result-score-card mb-3">
+                  <div id="totalScoreLabel" class="small text-uppercase text-muted-custom mb-1">คะแนนรวม</div>
+                  <div id="totalScore" class="result-score">0</div>
+                </div>
+
+                <div class="d-grid gap-3 mb-3">
+                  <div>
+                    <div id="urgencyLabelTitle" class="small text-uppercase text-muted-custom mb-2">ระดับ</div>
+                    <div id="urgencyLabel" class="status-pill low">Normal</div>
+                  </div>
+                  <div>
+                    <div id="redFlagTitle" class="small text-uppercase text-muted-custom mb-2">RED Flag</div>
+                    <div id="redFlag" class="status-pill neutral">ไม่พบ</div>
+                  </div>
+                </div>
+
+                <div class="d-grid gap-2 d-sm-flex mb-3">
+                  <button id="saveBtn" class="btn btn-success btn-lg flex-fill" type="button">บันทึกคะแนน</button>
+                  <button id="resetBtn" class="btn btn-outline-light btn-lg flex-fill" type="button">รีเซ็ต</button>
+                </div>
+
+                <p id="saveStatus" class="save-status mb-0" aria-live="polite"></p>
+              </div>
+            </section>
+
+            <section id="infectionAlertCard" class="card infection-alert-card border-0 shadow-sm mb-3 d-none" aria-live="polite">
+              <div class="card-body p-3 p-md-4">
+                <div id="infectionAlertKicker" class="infection-alert-kicker">Sepsis Alert</div>
+                <h2 id="infectionAlertTitle" class="h4 mb-2 text-white">&#xE2A;&#xE07;&#xE2A;&#xE31;&#xE22;&#xE20;&#xE32;&#xE27;&#xE30;&#xE15;&#xE34;&#xE14;&#xE40;&#xE0A;&#xE37;&#xE49;&#xE2D;</h2>
+                <p id="infectionAlertText" class="infection-alert-text mb-0">&#xE04;&#xE30;&#xE41;&#xE19;&#xE19;&#xE23;&#xE27;&#xE21;&#xE15;&#xE31;&#xE49;&#xE07;&#xE41;&#xE15;&#xE48; 5 &#xE04;&#xE30;&#xE41;&#xE19;&#xE19;&#xE02;&#xE36;&#xE49;&#xE19;&#xE44;&#xE1B; &#xE41;&#xE25;&#xE30;&#xE1E;&#xE1A;&#xE2B;&#xE23;&#xE37;&#xE2D;&#xE2A;&#xE07;&#xE2A;&#xE31;&#xE22;&#xE41;&#xE2B;&#xE25;&#xE48;&#xE07;&#xE15;&#xE34;&#xE14;&#xE40;&#xE0A;&#xE37;&#xE49;&#xE2D; &#xE04;&#xE27;&#xE23;&#xE40;&#xE1D;&#xE49;&#xE32;&#xE23;&#xE30;&#xE27;&#xE31;&#xE07;&#xE41;&#xE25;&#xE30;&#xE23;&#xE32;&#xE22;&#xE07;&#xE32;&#xE19;&#xE17;&#xE35;&#xE21;&#xE14;&#xE39;&#xE41;&#xE25;&#xE17;&#xE31;&#xE19;&#xE17;&#xE35;</p>
+              </div>
+            </section>
+
+            <section class="card app-card border-0 shadow-sm">
+              <div class="card-body p-3 p-md-4">
+                <h2 id="adviceSectionTitle" class="h4 mb-3 text-white">คำแนะนำการพยาบาล</h2>
+                <div id="adviceBox" class="advice-box"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <section id="historyView" class="app-view" data-view-panel="history" hidden>
+      <div class="row g-3 g-lg-4">
+        <div class="col-12 col-lg-8">
+          <section class="card app-card border-0 shadow-sm mb-3">
+            <div class="card-body p-3 p-md-4">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                  <h2 id="historySectionTitle" class="h4 mb-1 text-white">ประวัติการบันทึก</h2>
+                  <p id="historySectionSubtitle" class="text-muted-custom mb-0">เก็บไว้ในเครื่อง และสามารถส่งต่อไป Google Sheet ได้</p>
+                </div>
+                <button id="clearHistoryBtn" class="btn btn-outline-danger btn-sm" type="button">ล้างประวัติ</button>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <button id="toggleAdminLoginBtn" class="btn btn-outline-warning btn-sm" type="button">Admin Login</button>
+                <button id="adminLogoutBtn" class="btn btn-outline-secondary btn-sm d-none" type="button">Logout</button>
+              </div>
+
+              <div id="adminLoginPanel" class="history-admin-panel d-none mb-3">
+                <div class="row g-2 align-items-end">
+                  <div class="col-12 col-md-4">
+                    <label id="adminUsernameLabel" for="adminUsername" class="form-label mb-1">Username</label>
+                    <input id="adminUsername" class="form-control custom-control" type="text" autocomplete="username" />
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <label id="adminPasswordLabel" for="adminPassword" class="form-label mb-1">Password</label>
+                    <input id="adminPassword" class="form-control custom-control" type="password" autocomplete="current-password" />
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <button id="adminLoginBtn" class="btn btn-warning w-100" type="button">Login</button>
+                  </div>
+                </div>
+                <p id="adminStatus" class="history-source-note mb-0" aria-live="polite"></p>
+              </div>
+
+              <div class="history-filter-panel mb-3">
+                <div class="row g-2 align-items-end">
+                  <div class="col-12 col-md-3">
+                    <label id="historyFilterDateLabel" for="historyFilterDate" class="form-label mb-1">เลือกวันที่</label>
+                    <input id="historyFilterDate" class="form-control custom-control" type="date" />
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label id="historyFilterHnLabel" for="historyFilterHn" class="form-label mb-1">ค้นหา HN</label>
+                    <input id="historyFilterHn" class="form-control custom-control" type="text" inputmode="numeric" maxlength="9" placeholder="เช่น 123456789" />
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label id="historyFilterLocationLabel" for="historyFilterLocation" class="form-label mb-1">สถานที่</label>
+                    <select id="historyFilterLocation" class="form-select custom-control"></select>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label id="historyFilterLevelLabel" for="historyFilterLevel" class="form-label mb-1">ระดับ</label>
+                    <select id="historyFilterLevel" class="form-select custom-control"></select>
+                  </div>
+                  <div class="col-12 col-md-3">
+                    <label id="historyFilterRedLabel" for="historyFilterRed" class="form-label mb-1">RED Flag</label>
+                    <select id="historyFilterRed" class="form-select custom-control"></select>
+                  </div>
+                  <div class="col-12 col-md-9">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <button id="refreshHistoryBtn" class="btn btn-outline-light flex-md-fill" type="button">รีเฟรช</button>
+                      <button id="resetHistoryFiltersBtn" class="btn btn-outline-secondary flex-md-fill" type="button">ล้างตัวกรอง</button>
+                    </div>
+                  </div>
+                </div>
+                <p id="historyResultCount" class="history-result-count mb-0" aria-live="polite"></p>
+                <p id="historySourceNote" class="history-source-note mb-0" aria-live="polite"></p>
+              </div>
+
+              <div class="table-responsive history-table-wrap">
+                <table class="table table-dark align-middle mb-0 custom-table">
+                  <thead>
+                    <tr>
+                      <th id="historyHeadLocation">สถานที่</th>
+                      <th id="historyHeadHn">HN</th>
+                      <th id="historyHeadScore">คะแนน</th>
+                      <th id="historyHeadLevel">ระดับ</th>
+                      <th id="historyHeadTime">เวลา</th>
+                      <th id="historyHeadAction">จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      </section>
+
+      <section id="dashboardView" class="app-view dashboard-view" data-view-panel="dashboard" hidden>
+        <div class="dashboard-shell">
+          <div class="dashboard-topbar">
+            <div>
+              <span class="dashboard-back" aria-hidden="true">&#8592;</span>
+              <div>
+                <h2>CQI &amp; Performance</h2>
+                <p>ติดตามคุณภาพการดูแลผู้ป่วย Sepsis</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-toolbar">
+            <p id="dashboardStatus" class="dashboard-status" aria-live="polite">กำลังเตรียมข้อมูล...</p>
+            <div class="dashboard-filter-panel" aria-label="ตัวกรอง Dashboard">
+              <label>
+                <span>วันที่</span>
+                <input id="dashboardDateFilter" class="form-control custom-control" type="date" />
+              </label>
+              <label>
+                <span>สถานที่</span>
+                <select id="dashboardLocationFilter" class="form-select custom-control"></select>
+              </label>
+              <button id="dashboardRefreshBtn" class="btn btn-outline-primary" type="button">รีเฟรช</button>
+            </div>
+          </div>
+
+            <div class="dashboard-highlight-grid">
+              <article class="dashboard-highlight-card">
+                <span class="dashboard-highlight-icon image-icon" aria-hidden="true"><img src="icon sepsis/ผู้ป่วยsepsisทั้งหมด2.svg" alt="" /></span>
+                <div>
+                  <span>ผู้ป่วย Sepsis ทั้งหมด</span>
+                  <strong id="dashboardSummarySepsisCount">0</strong>
+                  <small>ราย</small>
+                </div>
+              </article>
+              <article class="dashboard-highlight-card">
+                <span class="dashboard-highlight-icon image-icon" aria-hidden="true"><img src="icon sepsis/ผู้ป่วยsepsisที่ได้ยาATB2.svg" alt="" /></span>
+                <div>
+                  <span>ผู้ป่วย sepsis ที่ได้รับยา ATB ภายใน 3 ชม.</span>
+                  <strong id="dashboardSummaryAtb3hCount">0</strong>
+                  <small id="dashboardSummaryAtb3hHint">ราย</small>
+                </div>
+              </article>
+              <article class="dashboard-highlight-card">
+                <span class="dashboard-highlight-icon image-icon" aria-hidden="true"><img src="icon sepsis/Sepsis2.svg" alt="" /></span>
+                <div>
+                  <span>ผู้ป่วย severe sepsis หรือ septic shock ที่ได้รับยา ATB ภายใน 1 ชม.</span>
+                  <strong id="dashboardSummarySevereAtbRate">-</strong>
+                  <small id="dashboardSummarySevereAtbHint">ยังไม่มีข้อมูลเวลา</small>
+                </div>
+              </article>
+            </div>
+
+            <section class="dashboard-panel dashboard-source-panel">
+              <div class="dashboard-panel-head">
+                <div>
+                  <h3>ตำแหน่งที่พบการติดเชื้อ (source of infection)</h3>
+                </div>
+              </div>
+              <div id="dashboardSourceRow" class="dashboard-source-row"></div>
+            </section>
+
+            <section class="dashboard-panel dashboard-trend-panel">
+                <div class="dashboard-panel-head">
+                  <div>
+                    <h3>แนวโน้มผลลัพธ์</h3>
+                  </div>
+                  <div class="dashboard-trend-controls">
+                    <div class="dashboard-metric-tabs" aria-label="metric ที่แสดง">
+                      <button class="active" type="button" data-dashboard-metric="sepsisCount">จำนวนผู้ป่วย</button>
+                      <button type="button" data-dashboard-metric="atbRate">% ATB in target</button>
+                      <button type="button" data-dashboard-metric="lactateRate">% Lactate done</button>
+                      <button type="button" data-dashboard-metric="fluidRate">% Fluid done</button>
+                    </div>
+                    <div class="dashboard-range-tabs" aria-label="ช่วงเวลา">
+                      <button type="button" data-dashboard-range="7">7 วัน</button>
+                      <button type="button" data-dashboard-range="30">30 วัน</button>
+                      <button type="button" data-dashboard-range="90">3 เดือน</button>
+                      <button class="active" type="button" data-dashboard-range="365">12 เดือน</button>
+                    </div>
+                  </div>
+                </div>
+                <div id="dashboardTrendChart" class="dashboard-trend-chart"></div>
+            </section>
+
+            <div class="dashboard-grid">
+              <section class="dashboard-panel">
+                <div class="dashboard-panel-head">
+                  <div>
+                    <h3>ตัวชี้วัดคุณภาพ</h3>
+                  </div>
+                </div>
+                <div id="dashboardKpiList" class="dashboard-kpi-list"></div>
+              </section>
+
+              <section class="dashboard-panel">
+                <div class="dashboard-panel-head">
+                  <div>
+                    <h3>ระดับความเสี่ยงจาก NEWS</h3>
+                  </div>
+                </div>
+                <div id="dashboardRiskBars" class="dashboard-bar-list"></div>
+              </section>
+            </div>
+        </div>
+      </section>
+
+      <section id="sepsisView" class="app-view sepsis-protocol-view" data-view-panel="sepsis" hidden>
+        <div class="sepsis-shell">
+          <section class="sepsis-hero-card">
+            <div class="sepsis-hero-top">
+              <button class="sepsis-icon-button" type="button" data-nav-view="home" aria-label="กลับหน้าหลัก">&#8592;</button>
+                <div class="sepsis-hero-title">
+                  <div class="sepsis-shield-icon" aria-hidden="true"><svg class="sepsis-svg-icon"><use href="#sp-shield"></use></svg></div>
+                  <div>
+                    <h2>Sepsis Protocol</h2>
+                    <p id="sepsisHeroProtocolText">Sepsis: ภายใน 3 ชั่วโมง</p>
+                  </div>
+                </div>
+              </div>
+          </section>
+
+          <div class="sepsis-layout">
+            <main class="sepsis-main">
+              <section class="sepsis-card sepsis-patient-card">
+                <div class="sepsis-patient-profile">
+                  <div id="sepsisPatientAvatar" class="sepsis-avatar" aria-hidden="true">
+                    <svg class="sepsis-svg-icon avatar"><use href="#sp-user"></use></svg>
+                  </div>
+                  <div class="sepsis-patient-copy">
+                    <div class="sepsis-patient-form-grid">
+                      <label class="sepsis-field">
+                        <span class="sepsis-field-label">HN</span>
+                        <input id="sepsisPatientHnInput" class="sepsis-input" type="text" inputmode="numeric" maxlength="9" placeholder="เช่น 123456789" />
+                      </label>
+                      <label class="sepsis-field">
+                        <span class="sepsis-field-label">อายุ</span>
+                        <div id="sepsisPatientAgeInput" class="sepsis-readonly-value">-</div>
+                      </label>
+                      <label class="sepsis-field">
+                        <span class="sepsis-field-label">เพศ</span>
+                        <div id="sepsisPatientSexInput" class="sepsis-readonly-value">-</div>
+                      </label>
+                      <div class="sepsis-field sepsis-field-span-full">
+                        <span class="sepsis-field-label">Assessment Location</span>
+                        <div id="sepsisAssessmentLocationText" class="sepsis-readonly-value">-</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="sepsis-patient-stats">
+                  <div class="sepsis-stat-block">
+                    <span class="sepsis-stat-label">วันที่คัดกรอง</span>
+                    <div id="sepsisStartDateTime" class="sepsis-readonly-value">-</div>
+                    <small id="sepsisStartDateHint">ดึงจากประวัติ NEWS</small>
+                  </div>
+                  <div class="sepsis-stat-block score">
+                    <span class="sepsis-stat-label">NEWS Score</span>
+                    <strong id="sepsisNewsScore">0</strong>
+                    <small id="sepsisNewsLevel">ยังไม่ระบุระดับ</small>
+                  </div>
+                </div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>Triage</h3>
+                    <p>ระดับความเร่งด่วน</p>
+                  </div>
+                </div>
+                <div class="sepsis-chip-grid sepsis-chip-grid-triage">
+                  <button class="sepsis-choice-card critical" type="button" data-sepsis-triage="Resuscitation">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/resuscitation.svg" alt="" /></span>
+                    <strong>Resuscitation</strong>
+                    <span>เร่งด่วนวิกฤต</span>
+                  </button>
+                  <button class="sepsis-choice-card emergency" type="button" data-sepsis-triage="Emergency">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/emergency.svg" alt="" /></span>
+                    <strong>Emergency</strong>
+                    <span>เร่งด่วน</span>
+                  </button>
+                  <button class="sepsis-choice-card urgent" type="button" data-sepsis-triage="Urgency">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/urgency.svg" alt="" /></span>
+                    <strong>Urgency</strong>
+                    <span>ด่วน</span>
+                  </button>
+                  <button class="sepsis-choice-card semi" type="button" data-sepsis-triage="Semi-urgency">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/semi-urgency.svg" alt="" /></span>
+                    <strong>Semi-urgency</strong>
+                    <span>ค่อนข้างด่วน</span>
+                  </button>
+                  <button class="sepsis-choice-card normal" type="button" data-sepsis-triage="Non-urgency">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/non-urgency.svg" alt="" /></span>
+                    <strong>Non-urgency</strong>
+                    <span>ไม่เร่งด่วน</span>
+                  </button>
+                </div>
+              </section>
+
+              <section class="sepsis-card sepsis-consult-card">
+                <div class="sepsis-consult-row">
+                  <div class="sepsis-consult-copy">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/doctor-notify.svg" alt="" /></span>
+                    <strong>แพทย์วินิจฉัย</strong>
+                  </div>
+                  <div class="sepsis-consult-actions">
+                    <input id="sepsisConsultTime" class="sepsis-input sepsis-consult-input" type="time" />
+                    <button id="sepsisConsultToggle" class="sepsis-action-toggle pending" type="button" aria-label="บันทึกเวลาแจ้งแพทย์"></button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>ประเภทภาวะ</h3>
+                    <p>เลือกประเภทภาวะของผู้ป่วย</p>
+                  </div>
+                </div>
+                <div class="sepsis-type-grid">
+                  <article class="sepsis-type-card active" data-sepsis-type="sepsis" role="button" tabindex="0">
+                    <div class="sepsis-type-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/Sepsis.svg" alt="" /></div>
+                    <div>
+                      <strong>SEPSIS</strong>
+                      <p>ภาวะติดเชื้อร่วมกับอวัยวะล้มเหลว</p>
+                    </div>
+                    <span class="sepsis-check" aria-hidden="true">&#10003;</span>
+                  </article>
+                  <article class="sepsis-type-card danger" data-sepsis-type="severe" role="button" tabindex="0">
+                    <div class="sepsis-type-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/Sepsis shock.svg" alt="" /></div>
+                    <div>
+                      <strong>SEVERE SEPSIS / SEPTIC SHOCK</strong>
+                      <p>ภาวะติดเชื้อรุนแรง ร่วมกับอวัยวะล้มเหลว และ/หรือ ช็อก</p>
+                    </div>
+                    <span class="sepsis-radio" aria-hidden="true"></span>
+                  </article>
+                </div>
+                <div class="sepsis-helper-note">การเลือกประเภทจะช่วยแนะนำแนวทางการรักษาและเป้าหมายการดูแลที่เหมาะสม</div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>Source of Infection</h3>
+                    <p>เลือกแหล่งติดเชื้อที่เป็นไปได้</p>
+                  </div>
+                </div>
+                <div class="sepsis-chip-grid">
+                  <button class="sepsis-choice-card source" type="button" data-sepsis-infection="Respiratory system">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/Respiration.svg" alt="" /></span>
+                    <strong>Respiratory system</strong>
+                  </button>
+                  <button class="sepsis-choice-card source" type="button" data-sepsis-infection="Urinary tract infection">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/Urinary tracy system.svg" alt="" /></span>
+                    <strong>Urinary tract infection</strong>
+                  </button>
+                  <button class="sepsis-choice-card source" type="button" data-sepsis-infection="Intra-abdominal infection">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/Intra-abdominal.svg" alt="" /></span>
+                    <strong>Intra-abdominal infection</strong>
+                  </button>
+                  <button class="sepsis-choice-card source" type="button" data-sepsis-infection="Skin and soft tissue">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/skin.svg" alt="" /></span>
+                    <strong>Skin and soft tissue</strong>
+                  </button>
+                  <button class="sepsis-choice-card source" type="button" data-sepsis-infection="Unknown source">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/unknow source.svg" alt="" /></span>
+                    <strong>Unknown source</strong>
+                  </button>
+                  <button class="sepsis-choice-card source" type="button" data-sepsis-infection="Other">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/other.svg" alt="" /></span>
+                    <strong>อื่นๆ</strong>
+                  </button>
+                </div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head align-center">
+                  <div class="sepsis-headline-inline">
+                    <div class="sepsis-inline-icon" aria-hidden="true"><svg class="sepsis-svg-icon"><use href="#sp-shield-check"></use></svg></div>
+                    <div>
+                      <h3 id="sepsisBundleTitle">Sepsis: ภายใน 3 ชั่วโมง</h3>
+                      <p id="sepsisBundleSubtitle">ติดตามความก้าวหน้าของ 7 ขั้นตอนสำคัญแบบเรียลไทม์ ภายใน 3 ชั่วโมง</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sepsis-stepper" aria-label="Sepsis 8 progress">
+                  <div class="sepsis-stepper-track">
+                    <div id="sepsisStepperProgress" class="sepsis-stepper-progress"></div>
+                  </div>
+                  <div id="sepsisStepperPoints" class="sepsis-stepper-points">
+                    <span data-step-point="consult">1</span>
+                    <span data-step-point="1">2</span>
+                    <span data-step-point="2">3</span>
+                    <span data-step-point="3">4</span>
+                    <span data-step-point="4">5</span>
+                    <span data-step-point="5">6</span>
+                    <span data-step-point="6">7</span>
+                    <span data-step-point="7">8</span>
+                  </div>
+                </div>
+
+                <div class="sepsis-summary-grid">
+                  <div class="sepsis-summary-item">
+                    <span class="sepsis-summary-label">เวลาที่ผ่านไป</span>
+                    <strong id="sepsisElapsedText">0 นาที</strong>
+                    <small>นับจากเวลาเริ่มคัดกรอง</small>
+                  </div>
+                  <div class="sepsis-summary-item">
+                    <span id="sepsisTargetLabel" class="sepsis-summary-label">Sepsis: ภายใน 3 ชั่วโมง</span>
+                    <strong id="sepsisRemainingText">180 นาที</strong>
+                    <small id="sepsisRemainingHint">เหลือเวลา</small>
+                  </div>
+                  <div class="sepsis-summary-item progress">
+                    <div class="sepsis-ring">
+                      <div id="sepsisRingInner" class="sepsis-ring-inner">0%</div>
+                    </div>
+                    <div>
+                      <strong id="sepsisCompletionTitle">ยังไม่เสร็จ</strong>
+                      <small id="sepsisCompletionText">ทำแล้ว 0 จาก 7 รายการ</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sepsis-actions-head">
+                  <h4>รายการดำเนินการ</h4>
+                  <button id="sepsisFilterBtn" class="sepsis-filter-chip" type="button">ทั้งหมด &#9662;</button>
+                </div>
+
+                <div id="sepsisActionList" class="sepsis-action-list">
+                  <article class="sepsis-action-item" data-sepsis-step="consult">
+                    <div class="sepsis-action-number">1</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/doctor-notify.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>แจ้งแพทย์</strong>
+                      <span>บันทึกเวลาแจ้งแพทย์ (Time Zero)</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="consult" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="consult" aria-label="ทำรายการที่ 1 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="1">
+                    <div class="sepsis-action-number">2</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/blood-culture.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>เจาะเลือดเพาะเชื้อ (Hemoculture)</strong>
+                      <span>เก็บ specimen จากตำแหน่งที่ติดเชื้อ</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="1" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="1" aria-label="ทำรายการที่ 1 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="2">
+                    <div class="sepsis-action-number">3</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/collect-specimen.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>Collect specimen from suspected source</strong>
+                      <span>เก็บ specimen เพิ่มเติมตามแหล่งติดเชื้อ</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="2" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="2" aria-label="ทำรายการที่ 2 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="3">
+                    <div class="sepsis-action-number">4</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/urinary-catheter.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>Retain foley's cath + Record urine output</strong>
+                      <span>คาสายสวนปัสสาวะ และบันทึกปริมาณปัสสาวะ</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="3" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="3" aria-label="ทำรายการที่ 3 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="4">
+                    <div class="sepsis-action-number">5</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/lactate.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>ตรวจ Lactate</strong>
+                      <span>ผลแลป Lactate</span>
+                    </div>
+                    <div class="sepsis-action-inline-group">
+                      <input id="sepsisLactateValue" class="sepsis-inline-input" type="number" min="0" step="0.1" placeholder="2.8" />
+                      <span class="sepsis-inline-unit">mmol/L</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="4" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="4" aria-label="ทำรายการที่ 4 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="5">
+                    <div class="sepsis-action-number">6</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/iv-fluid.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>ให้สารน้ำ (IV Fluid)</strong>
+                      <span id="sepsisActionHint5">ให้ 30 ml/kg ภายใน 3 ชั่วโมงแรก</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="5" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="5" aria-label="ทำรายการที่ 5 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="6">
+                    <div class="sepsis-action-number">7</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/antibiotic.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>ให้ยาปฏิชีวนะ (Antibiotic)</strong>
+                      <span id="sepsisActionHint6">ภายใน 3 ชั่วโมงแรก</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="6" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="6" aria-label="ทำรายการที่ 6 สำเร็จ"></button>
+                  </article>
+                  <article class="sepsis-action-item" data-sepsis-step="7">
+                    <div class="sepsis-action-number">8</div>
+                    <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/monitoring.svg" alt="" /></div>
+                    <div class="sepsis-action-copy">
+                      <strong>ประเมินอาการและติดตามสัญญาณชีพ</strong>
+                      <span>ติดตามอาการและประเมินซ้ำ</span>
+                    </div>
+                    <input class="sepsis-time-input" type="time" data-sepsis-time="7" />
+                    <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="7" aria-label="ทำรายการที่ 7 สำเร็จ"></button>
+                  </article>
+                </div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>Disposition</h3>
+                    <p>เลือกแนวทางการดูแลต่อเนื่อง</p>
+                  </div>
+                </div>
+                <div class="sepsis-chip-grid sepsis-chip-grid-disposition">
+                  <button class="sepsis-choice-card disposition admit" type="button" data-sepsis-disposition="Admit (Ward/ICU)">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/admit.svg" alt="" /></span>
+                    <strong>Admit (Ward/ICU)</strong>
+                    <span>รับไว้รักษาในโรงพยาบาล</span>
+                  </button>
+                  <button class="sepsis-choice-card disposition refer" type="button" data-sepsis-disposition="Refer">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/refer.svg" alt="" /></span>
+                    <strong>Refer</strong>
+                    <span>ส่งต่อโรงพยาบาลอื่น</span>
+                  </button>
+                  <button class="sepsis-choice-card disposition discharge" type="button" data-sepsis-disposition="Discharge">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/home.svg" alt="" /></span>
+                    <strong>Discharge</strong>
+                    <span>จำหน่ายกลับบ้าน</span>
+                  </button>
+                </div>
+              </section>
+            </main>
+
+            <aside class="sepsis-side">
+              <div class="sepsis-sticky-panel">
+              <section class="sepsis-card sepsis-current-case-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>เคสที่กำลังทำ</h3>
+                    <p>สรุปเคสปัจจุบันแบบย่อ และเปิดรายการเคสทั้งหมดเมื่อต้องสลับงาน</p>
+                  </div>
+                </div>
+                <div id="sepsisCurrentCaseSummary" class="sepsis-current-case-summary"></div>
+                <div class="sepsis-current-case-actions">
+                  <button id="sepsisNewCaseBtn" class="sepsis-secondary-button" type="button">เลือกจากประวัติ</button>
+                  <button id="sepsisOpenCaseModalBtn" class="sepsis-secondary-button" type="button">ดูเคสทั้งหมด</button>
+                  <button id="sepsisDeleteCurrentCaseBtn" class="sepsis-secondary-button sepsis-danger-button" type="button">ลบเคสที่กำลังทำ</button>
+                </div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>บันทึกเวลาสำคัญ</h3>
+                    <p id="sepsisTimelineSubtitle">Sepsis: ภายใน 3 ชั่วโมง</p>
+                  </div>
+                </div>
+                <div id="sepsisTimelineGrid" class="sepsis-timeline-grid">
+                  <div class="sepsis-timeline-item" data-sepsis-timeline="start">
+                    <span id="sepsisTimelineStartLabel">เริ่มคัดกรอง</span>
+                    <strong id="sepsisTimelineStartTime">-</strong>
+                    <small id="sepsisTimelineStartDate">ยังไม่ระบุ</small>
+                  </div>
+                  <div class="sepsis-timeline-item" data-sepsis-timeline="consult">
+                    <span>แพทย์วินิจฉัย</span>
+                    <strong id="sepsisTimelineConsultTime">-</strong>
+                    <small id="sepsisTimelineConsultOffset">รอดำเนินการ</small>
+                  </div>
+                  <div class="sepsis-timeline-item" data-sepsis-timeline="1">
+                    <span>เจาะเลือดเพาะเชื้อ</span>
+                    <strong id="sepsisTimelineTime1">-</strong>
+                    <small id="sepsisTimelineOffset1">รอดำเนินการ</small>
+                  </div>
+                  <div class="sepsis-timeline-item" data-sepsis-timeline="4">
+                    <span>ตรวจ Lactate</span>
+                    <strong id="sepsisTimelineTime4">-</strong>
+                    <small id="sepsisTimelineOffset4">รอดำเนินการ</small>
+                  </div>
+                  <div class="sepsis-timeline-item" data-sepsis-timeline="5">
+                    <span>ให้สารน้ำ</span>
+                    <strong id="sepsisTimelineTime5">-</strong>
+                    <small id="sepsisTimelineOffset5">รอดำเนินการ</small>
+                  </div>
+                  <div class="sepsis-timeline-item" data-sepsis-timeline="6">
+                    <span>ให้ยาปฏิชีวนะ</span>
+                    <strong id="sepsisTimelineTime6">-</strong>
+                    <small id="sepsisTimelineOffset6">รอดำเนินการ</small>
+                  </div>
+                </div>
+              </section>
+
+              <section class="sepsis-card sepsis-tip-card">
+                <div class="sepsis-tip-copy">
+                  <span class="sepsis-tip-icon" aria-hidden="true">&#128161;</span>
+                  <p id="sepsisTipText">Sepsis: ภายใน 3 ชั่วโมง</p>
+                </div>
+                <button id="sepsisSaveBtn" class="sepsis-primary-button" type="button">&#10133; บันทึก</button>
+                <textarea id="sepsisNoteInput" class="sepsis-note-input" rows="4" placeholder="บันทึก note เพิ่มเติม เช่น antibiotic ที่ให้, ชื่อผู้รับผิดชอบ, การตอบสนองหลังให้สารน้ำ"></textarea>
+                <div id="sepsisSaveStatus" class="sepsis-save-status" aria-live="polite"></div>
+              </section>
+
+              <section class="sepsis-card">
+                <div class="sepsis-section-head">
+                  <div>
+                    <h3>Care Focus</h3>
+                    <p>จุดเน้นสำหรับทีมดูแลในรอบนี้</p>
+                  </div>
+                </div>
+                <div class="sepsis-focus-list">
+                  <div class="sepsis-focus-item high">
+                    <strong>ติดตามความดันและระดับความรู้สึกตัว</strong>
+                    <span>ผู้ป่วย NEWS สูงและมีความเสี่ยง septic shock</span>
+                  </div>
+                  <div class="sepsis-focus-item">
+                    <strong>เตรียมผลเพาะเชื้อและ lactate</strong>
+                    <span>ใช้ประกอบการปรับแผนรักษาและ antibiotic</span>
+                  </div>
+                  <div class="sepsis-focus-item">
+                    <strong>บันทึก reassessment ให้ครบ</strong>
+                    <span>เพื่อส่งต่อเวรและติดตามคุณภาพการดูแล</span>
+                  </div>
+                </div>
+              </section>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="smartEvaluationView" class="app-view smart-evaluation-view" data-view-panel="evaluation" hidden>
+        <div class="smart-evaluation-shell">
+          <header class="smart-evaluation-hero">
+            <button class="sepsis-icon-button" type="button" data-nav-view="home" aria-label="กลับหน้าหลัก">&#8592;</button>
+            <div>
+              <span class="smart-evaluation-kicker">Smart Sepsis App</span>
+              <h2>แบบประเมินความพึงพอใจ</h2>
+              <p>ให้คะแนน 1-5 ตามแบบประเมิน Smart Sepsis App</p>
+            </div>
+          </header>
+
+          <form id="smartEvaluationForm" class="smart-evaluation-form">
+            <section class="smart-evaluation-card">
+              <div class="smart-evaluation-section-head">
+                <div>
+                  <h3>ส่วนที่ 1 ข้อมูลทั่วไป</h3>
+                  <p>เลือกข้อมูลผู้ประเมินก่อนให้คะแนน</p>
+                </div>
+              </div>
+              <div class="smart-evaluation-field-grid">
+                <fieldset class="smart-evaluation-field">
+                  <legend>ตำแหน่ง</legend>
+                  <label><input type="radio" name="position" value="พยาบาลวิชาชีพ" /> <span>พยาบาลวิชาชีพ</span></label>
+                  <label><input type="radio" name="position" value="ผู้ช่วยพยาบาล" /> <span>ผู้ช่วยพยาบาล</span></label>
+                  <label><input type="radio" name="position" value="อื่นๆ" /> <span>อื่นๆ</span></label>
+                </fieldset>
+                <fieldset class="smart-evaluation-field">
+                  <legend>ระยะเวลาการทำงาน</legend>
+                  <label><input type="radio" name="experience" value="น้อยกว่า 1 ปี" /> <span>น้อยกว่า 1 ปี</span></label>
+                  <label><input type="radio" name="experience" value="1-5 ปี" /> <span>1-5 ปี</span></label>
+                  <label><input type="radio" name="experience" value="มากกว่า 5 ปี" /> <span>มากกว่า 5 ปี</span></label>
+                </fieldset>
+              </div>
+            </section>
+
+            <section class="smart-evaluation-card">
+              <div class="smart-evaluation-section-head">
+                <div>
+                  <h3>ส่วนที่ 2 ความพึงพอใจต่อการทำงาน</h3>
+                  <p>1 = น้อยที่สุด, 5 = มากที่สุด</p>
+                </div>
+                <div class="smart-evaluation-score-summary">
+                  <span id="smartEvaluationAnswered">0/14</span>
+                </div>
+              </div>
+              <div id="smartEvaluationQuestions" class="smart-evaluation-question-list"></div>
+            </section>
+
+            <section class="smart-evaluation-card">
+              <div class="smart-evaluation-section-head">
+                <div>
+                  <h3>ส่วนที่ 3 ข้อเสนอแนะ</h3>
+                  <p>ข้อเสนอแนะหรือชื่นชม ให้กำลังใจ Team sepsis ER</p>
+                </div>
+              </div>
+              <textarea id="smartEvaluationSuggestion" name="suggestion" class="smart-evaluation-textarea" rows="5" placeholder="พิมพ์ข้อเสนอแนะเพิ่มเติม"></textarea>
+              <div class="smart-evaluation-actions">
+                <button id="smartEvaluationResetBtn" class="sepsis-secondary-button" type="button">ล้างแบบประเมิน</button>
+                <button class="sepsis-primary-button" type="submit">บันทึกแบบประเมิน</button>
+              </div>
+              <div id="smartEvaluationStatus" class="sepsis-save-status" aria-live="polite"></div>
+            </section>
+          </form>
+        </div>
+      </section>
+
+      <section id="knowledgeView" class="app-view" data-view-panel="knowledge" hidden>
+        <div class="card app-card border-0 shadow-sm mb-3">
+          <div class="card-body p-3 p-md-4">
+            <div class="home-view-head">
+              <div>
+                <h2 class="prototype-title mb-2">ความรู้และแนวทางการดูแล Sepsis</h2>
+              </div>
+            </div>
+
+            <div class="knowledge-grid">
+              <button class="knowledge-card" type="button" data-knowledge-image="image/1 ความหมายของ sepsis และ seotic shock.png" data-knowledge-title="ความหมายของ sepsis และ seotic shock">
+                <span class="knowledge-card-thumb" aria-hidden="true"><img src="image/1 ความหมายของ sepsis และ seotic shock.png" alt="" loading="lazy" /></span>
+                <strong>ความหมายของ sepsis และ seotic shock</strong>
+              </button>
+              <button class="knowledge-card" type="button" data-knowledge-image="image/2 สาเหตุและปัจจัยเสี่ยงของการติดเชื้อในกระแสเลือด.png" data-knowledge-title="สาเหตุและปัจจัยเสี่ยงของการติดเชื้อในกระแสเลือด">
+                <span class="knowledge-card-thumb" aria-hidden="true"><img src="image/2 สาเหตุและปัจจัยเสี่ยงของการติดเชื้อในกระแสเลือด.png" alt="" loading="lazy" /></span>
+                <strong>สาเหตุและปัจจัยเสี่ยงของการติดเชื้อในกระแสเลือด</strong>
+              </button>
+              <button class="knowledge-card" type="button" data-knowledge-image="image/3 กลไกการติดเชื้อในกระแสเลือด.png" data-knowledge-title="กลไกการติดเชื้อในกระแสเลือด">
+                <span class="knowledge-card-thumb" aria-hidden="true"><img src="image/3 กลไกการติดเชื้อในกระแสเลือด.png" alt="" loading="lazy" /></span>
+                <strong>กลไกการติดเชื้อในกระแสเลือด</strong>
+              </button>
+              <button class="knowledge-card" type="button" data-knowledge-image="image/4 แนวทางเวชปฏิบัติสำหรับการวินิจฉัยในประเทศไทย พ.ศ.2569.png" data-knowledge-title="แนวทางเวชปฏิบัติสำหรับการวินิจฉัยในประเทศไทย พ.ศ.2569">
+                <span class="knowledge-card-thumb" aria-hidden="true"><img src="image/4 แนวทางเวชปฏิบัติสำหรับการวินิจฉัยในประเทศไทย พ.ศ.2569.png" alt="" loading="lazy" /></span>
+                <strong>แนวทางเวชปฏิบัติสำหรับการวินิจฉัยในประเทศไทย พ.ศ.2569</strong>
+              </button>
+              <button class="knowledge-card" type="button" data-knowledge-image="image/5 Surviving Sepsis Campaign 2026.png" data-knowledge-title="Surviving Sepsis Campaign 2026">
+                <span class="knowledge-card-thumb" aria-hidden="true"><img src="image/5 Surviving Sepsis Campaign 2026.png" alt="" loading="lazy" /></span>
+                <strong>Surviving Sepsis Campaign 2026</strong>
+              </button>
+            </div>
+
+            <section class="knowledge-download-panel" aria-labelledby="knowledgeDownloadTitle">
+              <div>
+                <h3 id="knowledgeDownloadTitle">ดาวน์โหลดเอกสารเพิ่มเติม</h3>
+              </div>
+              <div class="knowledge-download-list">
+                <a class="knowledge-download-link" href="https://drive.google.com/uc?export=download&id=1fPYhvke4cgrqudH9f3KbZc9wpDNVBgQF" target="_blank" rel="noopener">
+                  <span class="knowledge-download-icon" aria-hidden="true">&#8681;</span>
+                  <span>แนวทางการดูแลผู้ป่วยติดเชื้อในกระแสเลือด</span>
+                </a>
+                <a class="knowledge-download-link" href="https://drive.google.com/uc?export=download&id=1pdv2OpVjzSmPVsYowOosJNB3KOw-t6C9" target="_blank" rel="noopener">
+                  <span class="knowledge-download-icon" aria-hidden="true">&#8681;</span>
+                  <span>sepsis protocal cheklist in ER</span>
+                </a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <div class="modal fade knowledge-modal" id="knowledgeImageModal" tabindex="-1" aria-labelledby="knowledgeImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+          <div class="modal-content knowledge-modal-content">
+            <div class="modal-header knowledge-modal-header">
+              <h2 id="knowledgeImageModalLabel" class="knowledge-modal-title">Knowledge</h2>
+              <div class="knowledge-modal-tools" aria-label="Knowledge image tools">
+                <button id="knowledgeZoomOutBtn" class="knowledge-tool-button" type="button" title="Zoom out" aria-label="Zoom out">&#8722;</button>
+                <button id="knowledgeZoomResetBtn" class="knowledge-tool-button text-tool" type="button" title="Reset zoom" aria-label="Reset zoom">100%</button>
+                <button id="knowledgeZoomInBtn" class="knowledge-tool-button" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+                <a id="knowledgeDownloadImageLink" class="knowledge-tool-button" href="#" download title="Download" aria-label="Download">&#8681;</a>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body knowledge-modal-body">
+              <div id="knowledgeModalViewport" class="knowledge-modal-viewport">
+                <img id="knowledgeModalImage" class="knowledge-modal-image" src="" alt="" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade smart-evaluation-thank-you-modal" id="smartEvaluationThankYouModal" tabindex="-1" aria-labelledby="smartEvaluationThankYouModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content smart-evaluation-thank-you-content">
+            <div class="modal-body smart-evaluation-thank-you-body">
+              <div class="smart-evaluation-thank-you-icon" aria-hidden="true">&#10003;</div>
+              <h2 id="smartEvaluationThankYouModalLabel">ขอบคุณสำหรับการประเมิน</h2>
+              <p>ข้อมูลของท่านจะถูกนำไปใช้ปรับปรุง Smart Sepsis App ให้ใช้งานได้ดียิ่งขึ้น</p>
+              <button class="sepsis-primary-button" type="button" data-bs-dismiss="modal">ตกลง</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade sepsis-case-modal" id="sepsisCaseModal" tabindex="-1" aria-labelledby="sepsisCaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+          <div class="modal-content sepsis-case-modal-content">
+            <div class="modal-header sepsis-case-modal-header">
+              <div>
+                <h2 id="sepsisCaseModalLabel" class="sepsis-case-modal-title">รายการเคส Sepsis Protocol</h2>
+                <p class="sepsis-case-modal-subtitle">แสดงเคสที่กำลังทำ และเคสที่ทำสมบูรณ์แล้ว 10 เคสล่าสุดจาก Google Sheet</p>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div id="sepsisCaseList" class="sepsis-case-list"></div>
+            </div>
+            <div class="modal-footer sepsis-case-modal-footer">
+              <button id="sepsisNewCaseBtnModal" class="sepsis-secondary-button" type="button" data-bs-dismiss="modal">เลือกจากประวัติ</button>
+              <button class="sepsis-secondary-button" type="button" data-bs-dismiss="modal">ปิด</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade sepsis-news-required-modal" id="sepsisNewsRequiredModal" tabindex="-1" aria-labelledby="sepsisNewsRequiredModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content sepsis-news-required-content">
+            <div class="modal-body sepsis-news-required-body">
+              <div class="sepsis-news-required-icon" aria-hidden="true">!</div>
+              <h2 id="sepsisNewsRequiredModalLabel">ไม่พบประวัติ NEWS ของ HN นี้</h2>
+              <p id="sepsisHistoryLookupText">กรุณากรอก NEWS ก่อน เพื่อใช้ข้อมูลผู้ป่วยใน Sepsis Protocol</p>
+              <a
+                id="sepsisGoNewsBtn"
+                class="sepsis-primary-button"
+                href="./index.html?view=assessment#assessment"
+                role="button"
+                onclick="if(window.goToNewsAssessmentFromSepsisHn){window.goToNewsAssessmentFromSepsisHn(); return false;} return true;"
+              >กรอก NEWS ก่อน</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sheetLoadingOverlay" class="sheet-loading-overlay" hidden aria-live="polite" aria-busy="true">
+        <div class="sheet-loading-dialog" role="status">
+          <div class="sheet-loading-spinner" aria-hidden="true"></div>
+          <strong id="sheetLoadingTitle">กำลังโหลดข้อมูล</strong>
+          <span id="sheetLoadingText">กำลังดึงข้อมูล...</span>
+        </div>
+      </div>
+
+      <section id="prototype-board" class="prototype-board" hidden>
+        <div class="prototype-board-head">
+          <div>
+            <span class="prototype-kicker">UI Mockup</span>
+            <h2 class="prototype-title">หน้าที่ 3 เป็นต้นไป ปรับตามภาพอ้างอิง</h2>
+            <p class="prototype-subtitle">คงหน้า 1 และ 2 เป็น flow ประเมิน NEWS เดิม แล้วเติมหน้าจอประกอบส่วนอื่นให้โทนและโครงสร้างใกล้ตัวอย่างมากขึ้น</p>
+          </div>
+        </div>
+
+        <div class="prototype-grid">
+          <article class="phone-shot" data-prototype-group="more">
+            <div class="phone-shot-header">
+              <span>3. Sepsis Protocol</span>
+              <span class="phone-shot-icon" aria-hidden="true">&#8962;</span>
+            </div>
+            <div class="phone-shot-body">
+              <div class="shot-headline">Sepsis 6 ภายใน 1 ชั่วโมง</div>
+              <div class="protocol-list">
+                <div class="protocol-item done"><span>แจ้งแพทย์</span><span>09:41</span></div>
+                <div class="protocol-item done"><span>เจาะเลือดเพาะเชื้อ</span><span>09:45</span></div>
+                <div class="protocol-item done"><span>ตรวจ Lactate</span><span>09:50</span></div>
+                <div class="protocol-item done"><span>ให้สารน้ำ (IV fluid)</span><span>10:00</span></div>
+                <div class="protocol-item pending"><span>ให้ยาปฏิชีวนะ (ATB)</span><span>10:15</span></div>
+                <div class="protocol-item pending"><span>ประเมินอาการและติดตามสัญญาณชีพ</span><span>ภายใน 1 ชั่วโมง</span></div>
+              </div>
+              <button class="prototype-cta" type="button">บันทึก / อัปเดต</button>
+            </div>
+          </article>
+
+          <article class="phone-shot" data-prototype-group="more">
+            <div class="phone-shot-header">
+              <span>4. บันทึกข้อมูลผู้ป่วย</span>
+              <span class="phone-shot-icon" aria-hidden="true">&#128190;</span>
+            </div>
+            <div class="phone-shot-body">
+              <div class="patient-form-mock">
+                <div class="mock-field"><span>HN</span><strong>1234567</strong></div>
+                <div class="mock-field"><span>ชื่อ-สกุล</span><strong>นายสมชาย ใจดี</strong></div>
+                <div class="mock-split">
+                  <div class="mock-field"><span>อายุ</span><strong>65 ปี</strong></div>
+                  <div class="mock-field"><span>เพศ</span><strong>ชาย</strong></div>
+                </div>
+                <div class="mock-field"><span>แผนก</span><strong>อุบัติเหตุและฉุกเฉิน</strong></div>
+                <div class="mock-field"><span>วันที่/เวลาคัดกรอง</span><strong>26 เม.ย. 2569 09:41</strong></div>
+                <div class="mock-field danger"><span>คะแนน NEWS</span><strong>14 (เสี่ยงสูง)</strong></div>
+                <div class="mock-split">
+                  <div class="mock-field"><span>Time Zero</span><strong>09:41</strong></div>
+                  <div class="mock-field"><span>เวลาให้ ATB</span><strong>10:15</strong></div>
+                </div>
+                <div class="mock-field"><span>ผู้บันทึก</span><strong>พยาบาลเวร ER</strong></div>
+              </div>
+              <button class="prototype-cta" type="button">บันทึกข้อมูล</button>
+            </div>
+          </article>
+
+          <article class="phone-shot" data-prototype-group="more">
+            <div class="phone-shot-header">
+              <span>ประวัติการประเมิน</span>
+              <span class="phone-shot-icon" aria-hidden="true">&#9776;</span>
+            </div>
+            <div class="phone-shot-body">
+              <div class="history-chip-row">
+                <span class="history-chip active">วันนี้</span>
+                <span class="history-chip">7 วัน</span>
+                <span class="history-chip">30 วัน</span>
+              </div>
+              <div class="history-mock-list">
+                <div class="history-mock-item">
+                  <strong>HN 1234567</strong>
+                  <span>09:41</span>
+                  <em class="risk-high">NEWS 14</em>
+                </div>
+                <div class="history-mock-item">
+                  <strong>HN 1234568</strong>
+                  <span>08:30</span>
+                  <em class="risk-mid">NEWS 8</em>
+                </div>
+                <div class="history-mock-item">
+                  <strong>HN 1234569</strong>
+                  <span>07:15</span>
+                  <em class="risk-watch">NEWS 5</em>
+                </div>
+                <div class="history-mock-item">
+                  <strong>HN 1234570</strong>
+                  <span>06:20</span>
+                  <em class="risk-low">NEWS 2</em>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="phone-shot" data-prototype-group="dashboard">
+            <div class="phone-shot-header">
+              <span>5. Dashboard สรุปผล</span>
+              <span class="phone-shot-icon" aria-hidden="true">&#128202;</span>
+            </div>
+            <div class="phone-shot-body">
+              <div class="dashboard-mock-grid">
+                <div class="dashboard-stat"><span>คัดกรองทั้งหมด</span><strong>128</strong></div>
+                <div class="dashboard-stat alert"><span>NEWS ≥ 7</span><strong>45</strong></div>
+                <div class="dashboard-stat"><span>ATB ภายใน 1 ชม.</span><strong>93.09%</strong></div>
+                <div class="dashboard-stat"><span>เวลาเฉลี่ยคัดกรอง</span><strong>15.6 นาที</strong></div>
+              </div>
+              <div class="bar-mock-chart">
+                <div class="bar green" style="height: 38%;"><span>18</span></div>
+                <div class="bar yellow" style="height: 58%;"><span>30</span></div>
+                <div class="bar orange" style="height: 68%;"><span>35</span></div>
+                <div class="bar red" style="height: 84%;"><span>45</span></div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="prototype-footer-grid">
+          <div class="prototype-footer-card" data-prototype-group="dashboard more">
+            <h3>ระดับความเสี่ยง (NEWS)</h3>
+            <div class="legend-row">
+              <span class="legend-pill legend-green">0-4</span>
+              <span class="legend-pill legend-yellow">5-6</span>
+              <span class="legend-pill legend-orange">7-12</span>
+              <span class="legend-pill legend-red">&ge; 13</span>
+            </div>
+          </div>
+
+          <div class="prototype-footer-card" data-prototype-group="more">
+            <h3>จุดเด่นแอป</h3>
+            <div class="feature-row">
+              <span>คัดกรองได้รวดเร็ว</span>
+              <span>บันทึกง่ายครบถ้วน</span>
+              <span>บันทึกย้อนหลังครบถ้วน</span>
+              <span>รายงานผลติดตามคุณภาพการดูแล</span>
+            </div>
+          </div>
+        </div>
+      </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobileSaveBar" class="mobile-save-bar">
+    <div class="mobile-save-meta">
+      <div id="mobileSaveHint" class="mobile-save-hint">Progress</div>
+      <div class="mobile-save-summary">
+        <span id="mobileProgressText" class="mobile-save-progress">0/8</span>
+        <span class="mobile-save-divider">•</span>
+        <span id="mobileScore" class="mobile-save-score">0</span>
+      </div>
+    </div>
+    <div class="mobile-save-actions">
+      <button id="mobileResetBtn" class="btn btn-outline-light mobile-reset-btn" type="button">Reset</button>
+      <button id="mobileSaveBtn" class="btn btn-success mobile-save-btn" type="button">Save Score</button>
+    </div>
+  </div>
+
+  <nav class="bottom-app-nav" aria-label="Main navigation">
+    <button class="bottom-app-nav-item active" type="button" data-app-view="home">
+      <span class="bottom-app-nav-icon" aria-hidden="true"><img src="icon sepsis/ปุ่มhome.svg" alt="" /></span>
+      <span class="bottom-app-nav-label">หน้าหลัก</span>
+    </button>
+    <button class="bottom-app-nav-item" type="button" data-app-view="assessment">
+      <span class="bottom-app-nav-icon" aria-hidden="true"><img src="icon sepsis/ประเมินNEWS.svg" alt="" /></span>
+      <span class="bottom-app-nav-label">ประเมิน</span>
+    </button>
+    <button class="bottom-app-nav-item" type="button" data-app-view="sepsis">
+      <span class="bottom-app-nav-icon" aria-hidden="true"><img src="icon sepsis/Sepsis protocol.svg" alt="" /></span>
+      <span class="bottom-app-nav-label">Sepsis</span>
+    </button>
+    <button class="bottom-app-nav-item" type="button" data-app-view="history">
+      <span class="bottom-app-nav-icon" aria-hidden="true"><img src="icon sepsis/history.svg" alt="" /></span>
+      <span class="bottom-app-nav-label">ประวัติ</span>
+    </button>
+    <button class="bottom-app-nav-item" type="button" data-app-view="dashboard">
+      <span class="bottom-app-nav-icon" aria-hidden="true"><img src="icon sepsis/Dashbroad.svg" alt="" /></span>
+      <span class="bottom-app-nav-label">Dashboard</span>
+    </button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script>
+    (function () {
+      var url = new URL(window.location.href);
+      var requestedView = (window.location.hash || "").replace("#", "") || url.searchParams.get("view");
+      if (requestedView !== "assessment") return;
+
+      var homeView = document.getElementById("homeView");
+      var assessmentView = document.getElementById("assessmentView");
+      var historyView = document.getElementById("historyView");
+      var sepsisView = document.getElementById("sepsisView");
+
+      if (homeView) homeView.setAttribute("hidden", "");
+      if (assessmentView) assessmentView.removeAttribute("hidden");
+      if (historyView) historyView.setAttribute("hidden", "");
+      if (sepsisView) sepsisView.setAttribute("hidden", "");
+    })();
+  </script>
+  <script src="app.js?v=20260610-readable-type-cache-fix"></script>
+</body>
+
+</html>
+
+
