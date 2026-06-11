@@ -1493,6 +1493,9 @@ function normalizeClockTime(value) {
     return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
   }
 
+  const completedDraft = completeClockTimeDraft(text);
+  if (isCompleteClockTime(completedDraft)) return completedDraft;
+
   const timeMatch = text
     .replace(/[น.]/g, "")
     .match(/(\d{1,2})\s*[:.]\s*(\d{2})(?:\s*[:.]\s*\d{2})?\s*(AM|PM)?/i);
@@ -2619,11 +2622,29 @@ function setupSepsisProtocol() {
     }
   });
 
-  consultTimeEl?.addEventListener("input", () => {
-    sepsisState.consultTime = normalizeClockTime(consultTimeEl.value);
-    persistSepsisState();
-    renderSepsisProtocol();
-  });
+  if (consultTimeEl) {
+    const commitConsultTimeInput = () => {
+      const completedValue = completeClockTimeDraft(consultTimeEl.value);
+      const nextValue = isCompleteClockTime(completedValue) ? completedValue : "";
+      consultTimeEl.value = nextValue;
+      sepsisState.consultTime = nextValue;
+      persistSepsisState();
+      renderSepsisProtocol();
+    };
+
+    consultTimeEl.value = formatClockTimeDraft(consultTimeEl.value);
+    consultTimeEl.addEventListener("input", () => {
+      consultTimeEl.value = formatClockTimeDraft(consultTimeEl.value);
+    });
+    consultTimeEl.addEventListener("change", commitConsultTimeInput);
+    consultTimeEl.addEventListener("blur", commitConsultTimeInput);
+    consultTimeEl.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        consultTimeEl.blur();
+      }
+    });
+  }
 
   consultToggleEl?.addEventListener("click", toggleSepsisConsultTime);
 
