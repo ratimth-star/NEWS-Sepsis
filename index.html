@@ -1040,7 +1040,6 @@
                     <strong>แพทย์วินิจฉัย</strong>
                   </div>
                   <div class="sepsis-consult-actions">
-                    <input id="sepsisConsultTime" class="sepsis-input sepsis-consult-input" type="time" />
                     <button id="sepsisConsultToggle" class="sepsis-action-toggle pending" type="button" aria-label="บันทึกเวลาแจ้งแพทย์"></button>
                   </div>
                 </div>
@@ -1171,7 +1170,6 @@
                       <strong>แจ้งแพทย์</strong>
                       <span>บันทึกเวลาแจ้งแพทย์ (Time Zero)</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="consult" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="consult" aria-label="ทำรายการที่ 1 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="1">
@@ -1181,7 +1179,7 @@
                       <strong>เจาะเลือดเพาะเชื้อ (Hemoculture)</strong>
                       <span>เก็บ specimen จากตำแหน่งที่ติดเชื้อ</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="1" />
+                    <input class="sepsis-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" data-sepsis-time="1" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="1" aria-label="ทำรายการที่ 1 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="2">
@@ -1191,7 +1189,6 @@
                       <strong>Collect specimen from suspected source</strong>
                       <span>เก็บ specimen เพิ่มเติมตามแหล่งติดเชื้อ</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="2" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="2" aria-label="ทำรายการที่ 2 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="3">
@@ -1201,7 +1198,6 @@
                       <strong>Retain foley's cath + Record urine output</strong>
                       <span>คาสายสวนปัสสาวะ และบันทึกปริมาณปัสสาวะ</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="3" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="3" aria-label="ทำรายการที่ 3 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="4">
@@ -1215,7 +1211,7 @@
                       <input id="sepsisLactateValue" class="sepsis-inline-input" type="number" min="0" step="0.1" placeholder="2.8" />
                       <span class="sepsis-inline-unit">mmol/L</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="4" />
+                    <input class="sepsis-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" data-sepsis-time-display="4" readonly />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="4" aria-label="ทำรายการที่ 4 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="5">
@@ -1225,7 +1221,7 @@
                       <strong>ให้สารน้ำ (IV Fluid)</strong>
                       <span id="sepsisActionHint5">ให้ 30 ml/kg ภายใน 3 ชั่วโมงแรก</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="5" />
+                    <input class="sepsis-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" data-sepsis-time="5" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="5" aria-label="ทำรายการที่ 5 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="6">
@@ -1235,7 +1231,7 @@
                       <strong>ให้ยาปฏิชีวนะ (Antibiotic)</strong>
                       <span id="sepsisActionHint6">ภายใน 3 ชั่วโมงแรก</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="6" />
+                    <input class="sepsis-time-input" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" data-sepsis-time="6" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="6" aria-label="ทำรายการที่ 6 สำเร็จ"></button>
                   </article>
                   <article class="sepsis-action-item" data-sepsis-step="7">
@@ -1245,7 +1241,6 @@
                       <strong>ประเมินอาการและติดตามสัญญาณชีพ</strong>
                       <span>ติดตามอาการและประเมินซ้ำ</span>
                     </div>
-                    <input class="sepsis-time-input" type="time" data-sepsis-time="7" />
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="7" aria-label="ทำรายการที่ 7 สำเร็จ"></button>
                   </article>
                 </div>
@@ -1259,10 +1254,15 @@
                   </div>
                 </div>
                 <div class="sepsis-chip-grid sepsis-chip-grid-disposition">
-                  <button class="sepsis-choice-card disposition admit" type="button" data-sepsis-disposition="Admit (Ward/ICU)">
+                  <button class="sepsis-choice-card disposition admit" type="button" data-sepsis-disposition="Admit Ward">
                     <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/admit.svg" alt="" /></span>
-                    <strong>Admit (Ward/ICU)</strong>
+                    <strong>Admit Ward</strong>
                     <span>รับไว้รักษาในโรงพยาบาล</span>
+                  </button>
+                  <button class="sepsis-choice-card disposition admit-icu" type="button" data-sepsis-disposition="Admit ICU">
+                    <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/monitoring.svg" alt="" /></span>
+                    <strong>Admit ICU</strong>
+                    <span>รับไว้รักษาในหอผู้ป่วยวิกฤต (ICU)</span>
                   </button>
                   <button class="sepsis-choice-card disposition refer" type="button" data-sepsis-disposition="Refer">
                     <span class="sepsis-choice-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/refer.svg" alt="" /></span>

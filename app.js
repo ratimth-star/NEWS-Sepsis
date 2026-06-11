@@ -6,7 +6,9 @@ const NEWS_REQUIRED_NAV_KEY = "suandok-news-required-nav-v1";
 const HISTORY_FETCH_LIMIT = 100;
 const HOME_SEPSIS_CASE_LIMIT = 5;
 const SEPSIS_PROTOCOL_KEY = "suandok-sepsis-protocol-v1";
-const SEPSIS_PROGRESS_TASKS = ["consult", 1, 2, 3, 4, 5, 6, 7];
+const SEPSIS_PROGRESS_TASKS = ["consult", 1, 4, 3, 2, 6, 5, 7];
+const SEPSIS_CHECK_ONLY_STEPS = new Set(["consult", 2, 3, 7]);
+const SEPSIS_SHARED_TIME_STEPS = new Map([[4, 1]]);
 const SMART_EVALUATION_KEY = "smart-sepsis-app-evaluation-v1";
 const SATISFACTION_SHEET_NAME = "Satisfaction Assessment Form";
 const APP_VERSION = "20260610-readable-type-cache-fix";
@@ -201,9 +203,9 @@ const PAGE_TEXT = {
       },
       consult: {
         title: "แพทย์วินิจฉัย",
-        toggleLabel: "บันทึกเวลาแจ้งแพทย์",
+        toggleLabel: "ติ๊กเมื่อแจ้งแพทย์แล้ว",
         doneTitle: "แจ้งแพทย์แล้ว",
-        pendingTitle: "รอบันทึกเวลาแจ้งแพทย์"
+        pendingTitle: "รอติ๊กแจ้งแพทย์"
       },
       type: {
         title: "ประเภทภาวะ",
@@ -240,7 +242,7 @@ const PAGE_TEXT = {
         items: "รายการ"
       },
       actions: {
-        consult: ["แจ้งแพทย์", "บันทึกเวลาแจ้งแพทย์ (Time Zero)"],
+        consult: ["แจ้งแพทย์", "ติ๊กเมื่อแจ้งแพทย์แล้ว"],
         1: ["เจาะเลือดเพาะเชื้อ (Hemoculture)", "เก็บ specimen จากตำแหน่งที่ติดเชื้อ"],
         2: ["Collect specimen from suspected source", "เก็บ specimen เพิ่มเติมตามแหล่งติดเชื้อ"],
         3: ["Retain foley's cath + Record urine output", "คาสายสวนปัสสาวะ และบันทึกปริมาณปัสสาวะ"],
@@ -252,7 +254,8 @@ const PAGE_TEXT = {
       disposition: {
         title: "Disposition",
         subtitle: "เลือกแนวทางการดูแลต่อเนื่อง",
-        admit: "รับไว้รักษาในโรงพยาบาล",
+        admitWard: "รับไว้รักษาในโรงพยาบาล (หอผู้ป่วยทั่วไป)",
+        admitIcu: "รับไว้รักษาในหอผู้ป่วยวิกฤต (ICU)",
         refer: "ส่งต่อโรงพยาบาลอื่น",
         discharge: "จำหน่ายกลับบ้าน"
       },
@@ -485,9 +488,9 @@ const PAGE_TEXT = {
       },
       consult: {
         title: "Physician diagnosis",
-        toggleLabel: "Record physician notification time",
+        toggleLabel: "Mark physician notified",
         doneTitle: "Physician notified",
-        pendingTitle: "Waiting for notification time"
+        pendingTitle: "Waiting for physician notification"
       },
       type: {
         title: "Clinical Type",
@@ -524,7 +527,7 @@ const PAGE_TEXT = {
         items: "items"
       },
       actions: {
-        consult: ["Notify physician", "Record physician notification time (Time Zero)"],
+        consult: ["Notify physician", "Mark when physician has been notified"],
         1: ["Draw blood culture (Hemoculture)", "Collect specimen from the infection site"],
         2: ["Collect specimen from suspected source", "Collect additional specimens by infection source"],
         3: ["Retain foley's cath + Record urine output", "Insert urinary catheter and record urine output"],
@@ -536,7 +539,8 @@ const PAGE_TEXT = {
       disposition: {
         title: "Disposition",
         subtitle: "Select the continuing care plan",
-        admit: "Admit to hospital",
+        admitWard: "Admit to ward",
+        admitIcu: "Admit to ICU",
         refer: "Refer to another hospital",
         discharge: "Discharge home"
       },
@@ -680,6 +684,9 @@ const I18N = {
     totalScoreLabel: "คะแนนรวม",
     urgencyLabelTitle: "ระดับ",
     redFlagTitle: "RED Flag",
+    infectionAlertKicker: "Sepsis Alert",
+    infectionAlertTitle: "สงสัยภาวะติดเชื้อ",
+    infectionAlertText: "คะแนนรวมตั้งแต่ 5 คะแนนขึ้นไป และพบหรือสงสัยแหล่งติดเชื้อ ควรเฝ้าระวังและรายงานทีมดูแลทันที",
     saveBtn: "บันทึกคะแนน",
     resetBtn: "รีเซ็ต",
     adviceSectionTitle: "คำแนะนำการพยาบาล",
@@ -690,7 +697,8 @@ const I18N = {
       temperature: "อุณหภูมิ",
       systolicBP: "ความดันโลหิตซิสโตลิก (มม.ปรอท)",
       heartRate: "อัตราการเต้นของหัวใจ (ครั้ง/นาที)",
-      consciousness: "ระดับความรู้สึกตัว (AVPU)"
+      consciousness: "ระดับความรู้สึกตัว (AVPU)",
+      infectionSource: "พบ หรือ สงสัยแหล่งติดเชื้อ (เช่น ระบบทางเดินหายใจ, การติดเชื้อทางเดินปัสสาวะ, การติดเชื้อในช่องท้อง, อื่นๆ)"
     },
     scaleLabels: {
       1: "เกณฑ์ทั่วไป",
@@ -754,6 +762,10 @@ const I18N = {
       consciousness: [
         { label: "รู้สึกตัวดี (A)", value: "0" },
         { label: "ตอบสนองต่อเสียง/ความเจ็บปวด/ไม่ตอบสนอง (V, P, U)", value: "3" }
+      ],
+      infectionSource: [
+        { label: "No", value: "No" },
+        { label: "Yes", value: "Yes" }
       ]
     },
     levelLabels: {
@@ -896,6 +908,9 @@ const I18N = {
     totalScoreLabel: "Total Score",
     urgencyLabelTitle: "Level",
     redFlagTitle: "RED Flag",
+    infectionAlertKicker: "Sepsis Alert",
+    infectionAlertTitle: "Suspected Infection",
+    infectionAlertText: "A total score of 5 or more with a found or suspected source of infection should prompt close monitoring and immediate team notification.",
     saveBtn: "Save Score",
     resetBtn: "Reset",
     adviceSectionTitle: "Nursing Advice",
@@ -906,7 +921,8 @@ const I18N = {
       temperature: "Temperature",
       systolicBP: "Systolic Blood Pressure (mmHg)",
       heartRate: "Heart Rate (beats/min)",
-      consciousness: "Consciousness Level (AVPU)"
+      consciousness: "Consciousness Level (AVPU)",
+      infectionSource: "Found or suspected source of infection (ex. Respiratory system, urinary tract infection, intra-abdominal infection, others)"
     },
     scaleLabels: {
       1: "General Criteria",
@@ -970,6 +986,10 @@ const I18N = {
       consciousness: [
         { label: "Alert (A)", value: "0" },
         { label: "Responds to Voice/Pain/Unresponsive (V, P, U)", value: "3" }
+      ],
+      infectionSource: [
+        { label: "No", value: "0" },
+        { label: "Yes", value: "2" }
       ]
     },
     levelLabels: {
@@ -1068,6 +1088,9 @@ const selectors = {
   urgencyLabel: document.getElementById("urgencyLabel"),
   redFlag: document.getElementById("redFlag"),
   infectionAlertCard: document.getElementById("infectionAlertCard"),
+  infectionAlertKicker: document.getElementById("infectionAlertKicker"),
+  infectionAlertTitle: document.getElementById("infectionAlertTitle"),
+  infectionAlertText: document.getElementById("infectionAlertText"),
   saveBtn: document.getElementById("saveBtn"),
   resetBtn: document.getElementById("resetBtn"),
   resetBtnTop: document.getElementById("resetBtnTop"),
@@ -1257,6 +1280,7 @@ function createDefaultSepsisState() {
     patientSex: "",
     assessmentLocation: "",
     triage: "",
+    consultDone: false,
     consultTime: "",
     infectionSource: "",
     disposition: "",
@@ -1309,6 +1333,12 @@ function normalizeSepsisProtocolType(value = "") {
   return "sepsis";
 }
 
+function normalizeSepsisDisposition(value = "") {
+  const text = String(value || "").trim();
+  if (text === "Admit (Ward/ICU)" || text.toLowerCase() === "admit") return "Admit Ward";
+  return text;
+}
+
 function getSepsisSheetProtocolType(type = "sepsis") {
   return normalizeSepsisProtocolType(type) === "severe" ? "septic shock" : "sepsis";
 }
@@ -1318,13 +1348,17 @@ function normalizeSepsisCase(input = {}) {
   const historyRecordKey = input.historyRecordKey || getHistoryRecordKey(input);
   const inputTasks = input.tasks || {};
   const tasks = Object.keys(base.tasks).reduce((record, step) => {
+    const stepNumber = Number(step);
     const task = inputTasks[step] || {};
-    const time = normalizeClockTime(task.time || "");
+    const sharedSourceStep = SEPSIS_SHARED_TIME_STEPS.get(stepNumber);
+    const sharedSourceTask = sharedSourceStep ? inputTasks[sharedSourceStep] || {} : {};
+    const rawTime = sharedSourceStep ? sharedSourceTask.time || task.time || "" : task.time || "";
+    const time = SEPSIS_CHECK_ONLY_STEPS.has(stepNumber) ? "" : normalizeClockTime(rawTime);
     record[step] = {
       ...base.tasks[step],
       ...task,
       time,
-      done: Boolean(task.done || time)
+      done: Boolean(task.done || (!sharedSourceStep && time))
     };
     return record;
   }, {});
@@ -1332,6 +1366,8 @@ function normalizeSepsisCase(input = {}) {
     ...base,
     ...input,
     type: normalizeSepsisProtocolType(input.type || input.protocolType || base.type),
+    disposition: normalizeSepsisDisposition(input.disposition || base.disposition),
+    consultDone: parseSheetBoolean(input.consultDone) || Boolean(normalizeClockTime(input.consultTime || "")),
     consultTime: normalizeClockTime(input.consultTime || ""),
     historyRecordKey,
     caseId: input.caseId || (historyRecordKey ? `sepsis-history-${hashSepsisCaseKey(historyRecordKey)}` : ""),
@@ -1466,8 +1502,82 @@ function normalizeClockTime(value) {
   if (meridiem === "PM" && hours < 12) hours += 12;
   if (meridiem === "AM" && hours === 12) hours = 0;
   if (Number.isNaN(hours) || Number.isNaN(minutes)) return text;
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return "";
 
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+function formatClockTimeDraft(value) {
+  const text = String(value || "");
+
+  if (/[:.]/.test(text)) {
+    const [rawHours = "", rawMinutes = ""] = text.split(/[:.]/);
+    let hourDigits = rawHours.replace(/\D/g, "").slice(0, 2);
+    let minuteDigits = rawMinutes.replace(/\D/g, "").slice(0, 2);
+
+    if (hourDigits.length === 2 && Number.parseInt(hourDigits, 10) > 23) {
+      hourDigits = hourDigits.slice(0, 1);
+    }
+
+    if (minuteDigits.length === 2 && Number.parseInt(minuteDigits, 10) > 59) {
+      minuteDigits = minuteDigits.slice(0, 1);
+    }
+
+    const displayHours = hourDigits.length === 1 ? hourDigits.padStart(2, "0") : hourDigits;
+    return `${displayHours}:${minuteDigits}`;
+  }
+
+  let digits = text.replace(/\D/g, "").slice(0, 4);
+
+  if (digits.length >= 2) {
+    const hours = Number.parseInt(digits.slice(0, 2), 10);
+    if (hours > 23) digits = digits.slice(0, 1);
+  }
+
+  if (digits.length >= 4) {
+    const minutes = Number.parseInt(digits.slice(2, 4), 10);
+    if (minutes > 59) digits = digits.slice(0, 3);
+  }
+
+  return digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+}
+
+function isCompleteClockTime(value) {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || "").trim());
+}
+
+function completeClockTimeDraft(value) {
+  const text = String(value || "").trim();
+
+  if (/[:.]/.test(text)) {
+    const [rawHours = "", rawMinutes = ""] = text.split(/[:.]/);
+    const hourDigits = rawHours.replace(/\D/g, "");
+    const minuteDigits = rawMinutes.replace(/\D/g, "");
+    if (!hourDigits || !minuteDigits || hourDigits.length > 2 || minuteDigits.length > 2) return "";
+
+    const hours = Number.parseInt(hourDigits, 10);
+    const minutes = Number.parseInt(minuteDigits, 10);
+    if (Number.isNaN(hours) || Number.isNaN(minutes) || hours > 23 || minutes > 59) return "";
+
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  const digits = text.replace(/\D/g, "");
+  if (digits.length === 3) {
+    const hours = Number.parseInt(digits.slice(0, 1), 10);
+    const minutes = Number.parseInt(digits.slice(1), 10);
+    if (Number.isNaN(hours) || Number.isNaN(minutes) || minutes > 59) return "";
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  if (digits.length === 4) {
+    const hours = Number.parseInt(digits.slice(0, 2), 10);
+    const minutes = Number.parseInt(digits.slice(2), 10);
+    if (Number.isNaN(hours) || Number.isNaN(minutes) || hours > 23 || minutes > 59) return "";
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  return "";
 }
 
 function formatTimeDisplay(value) {
@@ -1560,25 +1670,27 @@ function getStartDate(sepsis = sepsisState) {
   const screeningDate = parsedTime ? new Date(parsedTime) : new Date(sepsis.startDateTime);
   if (Number.isNaN(screeningDate.getTime())) return null;
   if (sepsis.type === "severe") {
-    return getDateTimeFromStartAndTime(screeningDate, sepsis.consultTime) || null;
+    return getDateTimeFromStartAndTime(screeningDate, sepsis.consultTime) || screeningDate;
   }
   return screeningDate;
 }
 
 function getTaskDateTime(step, sepsis = sepsisState) {
   const start = getStartDate(sepsis);
-  const time = sepsis.tasks?.[step]?.time || "";
+  const time = getSepsisStepTime(step, sepsis);
   if (!start || !time) return null;
   return getDateTimeFromStartAndTime(start, time);
 }
 
 function isSepsisStepDone(step, sepsis = sepsisState) {
-  if (step === "consult") return Boolean(sepsis.consultTime);
-  return Boolean(sepsis.tasks?.[step]?.done);
+  if (step === "consult") return Boolean(sepsis.consultDone || sepsis.consultTime);
+  return Boolean(sepsis.tasks?.[step]?.done || (!SEPSIS_CHECK_ONLY_STEPS.has(step) && getSepsisStepTime(step, sepsis)));
 }
 
 function getSepsisStepTime(step, sepsis = sepsisState) {
   if (step === "consult") return normalizeClockTime(sepsis.consultTime || "");
+  const sharedSourceStep = SEPSIS_SHARED_TIME_STEPS.get(step);
+  if (sharedSourceStep) return normalizeClockTime(sepsis.tasks?.[sharedSourceStep]?.time || sepsis.tasks?.[step]?.time || "");
   return normalizeClockTime(sepsis.tasks?.[step]?.time || "");
 }
 
@@ -1603,9 +1715,13 @@ function getDateTimeFromStartAndTime(startDate, timeValue) {
   if (meridiem === "PM" && hours < 12) hours += 12;
   if (meridiem === "AM" && hours === 12) hours = 0;
   if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null;
 
   const result = new Date(startDate);
   result.setHours(hours, minutes, 0, 0);
+  if (result.getTime() < startDate.getTime()) {
+    result.setDate(result.getDate() + 1);
+  }
   return result;
 }
 
@@ -1691,7 +1807,7 @@ function createSepsisSheetPayload(sepsis = sepsisState) {
     disposition: normalized.disposition || "",
     newsScore: normalized.newsScore || 0,
     newsLevel: normalized.newsLevel || "",
-    consultDone: Boolean(normalizeClockTime(normalized.consultTime)),
+    consultDone: isSepsisStepDone("consult", normalized),
     consultTime: normalizeClockTime(normalized.consultTime),
     bloodCultureDone: Boolean(task(1).done),
     bloodCultureTime: task(1).time || "",
@@ -2181,11 +2297,12 @@ function setSepsisType(type) {
 }
 
 function toggleSepsisConsultTime() {
-  if (sepsisState.consultTime) {
+  if (isSepsisStepDone("consult", sepsisState)) {
+    sepsisState.consultDone = false;
     sepsisState.consultTime = "";
   } else {
-    const now = new Date();
-    sepsisState.consultTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    sepsisState.consultDone = true;
+    sepsisState.consultTime = "";
   }
   persistSepsisState();
   renderSepsisProtocol();
@@ -2195,6 +2312,7 @@ function setSepsisTaskTime(step, value) {
   const nextValue = normalizeClockTime(value);
   if (step === "consult") {
     sepsisState.consultTime = nextValue;
+    sepsisState.consultDone = Boolean(nextValue);
     persistSepsisState();
     renderSepsisProtocol();
     return;
@@ -2203,6 +2321,12 @@ function setSepsisTaskTime(step, value) {
   if (!task) return;
   task.time = nextValue;
   task.done = Boolean(nextValue);
+  SEPSIS_SHARED_TIME_STEPS.forEach((sourceStep, sharedStep) => {
+    if (sourceStep !== step) return;
+    const sharedTask = sepsisState.tasks[sharedStep];
+    if (!sharedTask) return;
+    sharedTask.time = nextValue;
+  });
   persistSepsisState();
   renderSepsisProtocol();
 }
@@ -2216,13 +2340,22 @@ function toggleSepsisTask(step) {
   if (!task) return;
   const nextDone = !task.done;
   task.done = nextDone;
-  if (nextDone && !task.time) {
+  if (nextDone && !task.time && !SEPSIS_CHECK_ONLY_STEPS.has(step) && !SEPSIS_SHARED_TIME_STEPS.has(step)) {
     const now = new Date();
     task.time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  }
+  if (nextDone && SEPSIS_SHARED_TIME_STEPS.has(step)) {
+    task.time = getSepsisStepTime(step, sepsisState);
   }
   if (!nextDone) {
     task.time = "";
   }
+  SEPSIS_SHARED_TIME_STEPS.forEach((sourceStep, sharedStep) => {
+    if (sourceStep !== step) return;
+    const sharedTask = sepsisState.tasks[sharedStep];
+    if (!sharedTask) return;
+    sharedTask.time = task.time || "";
+  });
   persistSepsisState();
   renderSepsisProtocol();
 }
@@ -2339,6 +2472,11 @@ function renderSepsisProtocol() {
   document.querySelectorAll("[data-step-point]").forEach(point => {
     const rawStep = point.getAttribute("data-step-point");
     const step = rawStep && !Number.isNaN(Number(rawStep)) ? Number(rawStep) : rawStep;
+    const orderIndex = SEPSIS_PROGRESS_TASKS.findIndex(item => item === step);
+    if (orderIndex >= 0) {
+      point.style.order = String(orderIndex + 1);
+      point.textContent = String(orderIndex + 1);
+    }
     point.classList.toggle("done", isSepsisStepDone(step, sepsisState));
   });
 
@@ -2362,7 +2500,7 @@ function renderSepsisProtocol() {
   if (timelineStartDateEl) timelineStartDateEl.textContent = startDate ? formatDateThai(sepsisState.startDateTime) : copy.timeline.notSet;
   if (timelineConsultTimeEl) timelineConsultTimeEl.textContent = formatTimeDisplay(sepsisState.consultTime || "");
   if (consultToggleEl) {
-    const isDone = Boolean(sepsisState.consultTime);
+    const isDone = isSepsisStepDone("consult", sepsisState);
     consultToggleEl.classList.toggle("done", isDone);
     consultToggleEl.classList.toggle("pending", !isDone);
     consultToggleEl.innerHTML = isDone ? "&#10003;" : "";
@@ -2379,7 +2517,7 @@ function renderSepsisProtocol() {
     }
   }
 
-  SEPSIS_PROGRESS_TASKS.forEach(step => {
+  SEPSIS_PROGRESS_TASKS.forEach((step, index) => {
     const label = getSepsisActionLabel(step);
     const resolvedStep = step && !Number.isNaN(Number(step)) ? Number(step) : step;
     const task = typeof resolvedStep === "number" ? sepsisState.tasks[resolvedStep] : null;
@@ -2387,11 +2525,16 @@ function renderSepsisProtocol() {
     const timeValue = getSepsisStepTime(resolvedStep, sepsisState);
     const article = document.querySelector(`[data-sepsis-step="${step}"]`);
     const timeInput = document.querySelector(`[data-sepsis-time="${step}"]`);
+    const timeDisplayInput = document.querySelector(`[data-sepsis-time-display="${step}"]`);
     const toggleButton = document.querySelector(`[data-sepsis-toggle="${step}"]`);
+    const timelineItem = document.querySelector(`[data-sepsis-timeline="${step}"]`);
     const timelineTime = document.getElementById(`sepsisTimelineTime${step}`);
     const timelineOffset = document.getElementById(`sepsisTimelineOffset${step}`);
 
     if (article) {
+      article.style.order = String(index + 1);
+      const numberEl = article.querySelector(".sepsis-action-number");
+      if (numberEl) numberEl.textContent = String(index + 1);
       article.classList.toggle("done", done);
       article.classList.toggle("pending", !done);
       const shouldHide = (sepsisFilterMode === "done" && !done) || (sepsisFilterMode === "pending" && done);
@@ -2400,12 +2543,19 @@ function renderSepsisProtocol() {
     if (timeInput) {
       timeInput.value = timeValue;
     }
+    if (timeDisplayInput) {
+      timeDisplayInput.value = timeValue;
+    }
     if (toggleButton) {
       toggleButton.classList.toggle("done", done);
       toggleButton.classList.toggle("pending", !done);
       toggleButton.innerHTML = done ? "&#10003;" : "";
       toggleButton.setAttribute("aria-pressed", done ? "true" : "false");
       toggleButton.setAttribute("title", `${label} ${done ? copy.progress.done : copy.progress.pending}`);
+    }
+    if (timelineItem) {
+      timelineItem.style.order = String(index + 1);
+      timelineItem.hidden = SEPSIS_CHECK_ONLY_STEPS.has(resolvedStep);
     }
     if (timelineTime) {
       timelineTime.textContent = formatTimeDisplay(timeValue);
@@ -2415,6 +2565,8 @@ function renderSepsisProtocol() {
       if (done && taskDate && startDate) {
         const diff = Math.max(0, Math.round((taskDate.getTime() - startDate.getTime()) / 60000));
         timelineOffset.textContent = `${diff} ${minuteUnit}`;
+      } else if (done || timeValue) {
+        timelineOffset.textContent = copy.progress.done;
       } else {
         timelineOffset.textContent = copy.timeline.pending;
       }
@@ -2535,10 +2687,26 @@ function setupSepsisProtocol() {
   });
 
   document.querySelectorAll("[data-sepsis-time]").forEach(input => {
-    input.addEventListener("input", () => {
+    const commitTimeInput = () => {
       const rawStep = input.getAttribute("data-sepsis-time");
       const step = rawStep && !Number.isNaN(Number(rawStep)) ? Number(rawStep) : rawStep;
-      setSepsisTaskTime(step, input.value);
+      const completedValue = completeClockTimeDraft(input.value);
+      const nextValue = isCompleteClockTime(completedValue) ? completedValue : "";
+      input.value = nextValue;
+      setSepsisTaskTime(step, nextValue);
+    };
+
+    input.value = formatClockTimeDraft(input.value);
+    input.addEventListener("input", () => {
+      input.value = formatClockTimeDraft(input.value);
+    });
+    input.addEventListener("change", commitTimeInput);
+    input.addEventListener("blur", commitTimeInput);
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        input.blur();
+      }
     });
   });
 
@@ -3017,6 +3185,9 @@ function applyStaticTranslations() {
   document.getElementById("totalScoreLabel").textContent = copy.totalScoreLabel;
   document.getElementById("urgencyLabelTitle").textContent = copy.urgencyLabelTitle;
   document.getElementById("redFlagTitle").textContent = copy.redFlagTitle;
+  if (selectors.infectionAlertKicker) selectors.infectionAlertKicker.textContent = copy.infectionAlertKicker;
+  if (selectors.infectionAlertTitle) selectors.infectionAlertTitle.textContent = copy.infectionAlertTitle;
+  if (selectors.infectionAlertText) selectors.infectionAlertText.textContent = copy.infectionAlertText;
   selectors.saveBtn.textContent = copy.saveBtn;
   selectors.resetBtn.textContent = copy.resetBtn;
   if (selectors.mobileSaveBtn) selectors.mobileSaveBtn.textContent = copy.saveBtn;
@@ -3213,7 +3384,8 @@ function applySepsisStaticTranslations() {
     if (titleEl) titleEl.textContent = copy.disposition.title;
     if (subtitleEl) subtitleEl.textContent = copy.disposition.subtitle;
   }
-  setChoiceCardText('[data-sepsis-disposition="Admit (Ward/ICU)"]', "Admit (Ward/ICU)", copy.disposition.admit);
+  setChoiceCardText('[data-sepsis-disposition="Admit Ward"]', "Admit Ward", copy.disposition.admitWard);
+  setChoiceCardText('[data-sepsis-disposition="Admit ICU"]', "Admit ICU", copy.disposition.admitIcu);
   setChoiceCardText('[data-sepsis-disposition="Refer"]', "Refer", copy.disposition.refer);
   setChoiceCardText('[data-sepsis-disposition="Discharge"]', "Discharge", copy.disposition.discharge);
 
@@ -3292,6 +3464,7 @@ function renderMetricButtons(containerId, inputId, options) {
 
   if (!input || !container) return;
 
+  const showScore = input.classList.contains("score-input");
   container.innerHTML = options.map((option, index) => {
     const optionKey = `${inputId}-${index}`;
     return `
@@ -3303,7 +3476,7 @@ function renderMetricButtons(containerId, inputId, options) {
         data-score-value="${option.value}"
       >
         <span class="metric-option-text">${escapeHtml(option.label)}</span>
-        <span class="metric-option-score score-${option.value}">+${option.value}</span>
+        ${showScore ? `<span class="metric-option-score score-${option.value}">+${option.value}</span>` : ""}
       </button>
     `;
   }).join("");
@@ -3396,7 +3569,22 @@ function shouldShowInfectionAlert(score) {
 
 function updateInfectionAlert(score) {
   if (!selectors.infectionAlertCard) return;
-  selectors.infectionAlertCard.classList.toggle("d-none", !shouldShowInfectionAlert(score));
+  selectors.infectionAlertCard.classList.remove(
+    "severity-theme-normal",
+    "severity-theme-low",
+    "severity-theme-urgent",
+    "severity-theme-emergent",
+    "severity-theme-red"
+  );
+
+  if (!shouldShowInfectionAlert(score)) {
+    selectors.infectionAlertCard.classList.add("d-none");
+    return;
+  }
+
+  const levelKey = getRiskLevel(score);
+  selectors.infectionAlertCard.classList.add(`severity-theme-${getSeverityTheme(levelKey, false)}`);
+  selectors.infectionAlertCard.classList.remove("d-none");
 }
 
 function updateAssessmentValidation(showErrors = validationActive) {
@@ -3858,6 +4046,7 @@ function normalizeSepsisSheetItem(item = {}, historyItem = null) {
     infectionSource: item.infectionSource || parsed.infectionSource || "",
     disposition: item.disposition || parsed.disposition || "",
     lactateValue: item.lactateValue || parsed.lactateValue || "",
+    consultDone: parseSheetBoolean(item.consultDone ?? parsed.consultDone),
     consultTime: normalizeClockTime(item.consultTime || parsed.consultTime || ""),
     newsScore: Number.parseInt(item.newsScore || parsed.newsScore || historyCase?.newsScore || 0, 10) || 0,
     newsLevel: item.newsLevel || parsed.newsLevel || historyCase?.newsLevel || "",

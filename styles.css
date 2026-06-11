@@ -912,6 +912,17 @@ h3,
 
 .metric-option-grid-compact {
   justify-content: center;
+  align-items: center;
+}
+
+.metric-option-grid-compact .metric-option-button {
+  flex: 0 1 clamp(7.5rem, 22vw, 9.5rem);
+  min-width: clamp(7.5rem, 22vw, 9.5rem);
+  justify-content: center;
+}
+
+.metric-option-grid-compact .metric-option-text {
+  text-align: center;
 }
 
 .metric-option-grid-wide .metric-option-button {
@@ -1033,6 +1044,7 @@ h3,
 }
 
 .result-panel,
+.infection-alert-card,
 .advice-card {
   --severity-border: rgba(22, 84, 111, 0.14);
   --severity-fill-strong: rgba(8, 145, 178, 0.14);
@@ -1281,6 +1293,58 @@ h3,
 .advice-box {
   display: grid;
   gap: .85rem;
+}
+
+.infection-alert-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, var(--severity-fill-strong, rgba(8, 145, 178, 0.14)), rgba(255, 255, 255, 0.32)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--severity-fill-soft, rgba(231, 246, 251, 0.98)));
+  border: 2px solid var(--severity-border, rgba(22, 84, 111, 0.14)) !important;
+  border-radius: 1.25rem;
+  box-shadow: 0 10px 28px var(--severity-shadow, rgba(62, 125, 145, 0.08));
+}
+
+.infection-alert-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--severity-border, rgba(22, 84, 111, 0.14)), rgba(103, 232, 249, 0.22), transparent 85%);
+}
+
+.infection-alert-card .card-body {
+  padding: 1rem !important;
+}
+
+.infection-alert-kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: .3rem .78rem;
+  margin-bottom: .75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--severity-text, #0f4f69);
+  border: 1px solid var(--severity-border, rgba(22, 84, 111, 0.14));
+  font-size: .88rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.infection-alert-card h2 {
+  color: var(--severity-text, #0f4f69) !important;
+  font-weight: 800;
+}
+
+.infection-alert-text {
+  color: var(--severity-text, #0f4f69);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  opacity: .86;
 }
 
 .advice-card {
@@ -1674,6 +1738,17 @@ h3,
     line-height: 1.25;
     flex: 1 1 auto;
     min-width: 0;
+  }
+
+  .metric-option-grid-compact .metric-option-button {
+    width: min(100%, 9.5rem);
+    min-width: min(100%, 9.5rem);
+    flex: 0 1 min(100%, 9.5rem);
+    align-items: center;
+  }
+
+  .metric-option-grid-compact .metric-option-text {
+    text-align: center;
   }
 
   .metric-option-score {
@@ -4394,7 +4469,7 @@ h3,
 }
 
 .sepsis-chip-grid-disposition {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .sepsis-choice-card {
@@ -4448,6 +4523,10 @@ h3,
 
 .sepsis-choice-card.admit {
   color: #16a34a;
+}
+
+.sepsis-choice-card.admit-icu {
+  color: #6d5bd0;
 }
 
 .sepsis-choice-card.refer {
@@ -4531,6 +4610,12 @@ h3,
   border-color: rgba(5, 150, 105, 0.72);
   background: linear-gradient(180deg, #daf8e9 0%, #caf2dd 100%);
   box-shadow: 0 16px 30px rgba(5, 150, 105, 0.16);
+}
+
+.sepsis-choice-card.admit-icu.active {
+  border-color: rgba(109, 91, 208, 0.72);
+  background: linear-gradient(180deg, #ece8ff 0%, #ddd6fe 100%);
+  box-shadow: 0 16px 30px rgba(109, 91, 208, 0.16);
 }
 
 .sepsis-choice-card.active strong,
@@ -5903,7 +5988,7 @@ h3,
   }
 
   .sepsis-chip-grid-disposition {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .sepsis-summary-grid {
