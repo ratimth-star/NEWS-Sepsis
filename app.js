@@ -203,9 +203,9 @@ const PAGE_TEXT = {
       },
       consult: {
         title: "แพทย์วินิจฉัย",
-        toggleLabel: "ติ๊กเมื่อแจ้งแพทย์แล้ว",
-        doneTitle: "แจ้งแพทย์แล้ว",
-        pendingTitle: "รอติ๊กแจ้งแพทย์"
+        toggleLabel: "บันทึกเวลาแพทย์วินิจฉัย",
+        doneTitle: "บันทึกเวลาแพทย์วินิจฉัยแล้ว",
+        pendingTitle: "รอบันทึกเวลาแพทย์วินิจฉัย"
       },
       type: {
         title: "ประเภทภาวะ",
@@ -320,6 +320,7 @@ const PAGE_TEXT = {
         chooseHistoryFirst: "กรุณาเลือกหรือบันทึก NEWS ในประวัติก่อน จึงจะเปิดเป็นเคสที่กำลังทำได้",
         loadedFromAssessment: "ดึงข้อมูลจากแบบประเมินแล้ว",
         saveRequiresCase: "กรุณาเลือกเคสจากประวัติ NEWS ก่อนบันทึก Sepsis Protocol",
+        saveRequiresDiagnosisTime: "กรุณาระบุเวลาแพทย์วินิจฉัยก่อนบันทึก Sepsis Protocol",
         savePending: "บันทึก Sepsis Protocol ลงเครื่องแล้ว กำลังส่งไป Google Sheet...",
         saveSuccess: "บันทึก Sepsis Protocol ลง sheet sepsis เรียบร้อยแล้ว",
         saveError: "บันทึกลงเครื่องแล้ว แต่ส่งไป sheet sepsis ไม่สำเร็จ",
@@ -488,9 +489,9 @@ const PAGE_TEXT = {
       },
       consult: {
         title: "Physician diagnosis",
-        toggleLabel: "Mark physician notified",
-        doneTitle: "Physician notified",
-        pendingTitle: "Waiting for physician notification"
+        toggleLabel: "Record physician diagnosis time",
+        doneTitle: "Physician diagnosis time recorded",
+        pendingTitle: "Waiting for physician diagnosis time"
       },
       type: {
         title: "Clinical Type",
@@ -605,6 +606,7 @@ const PAGE_TEXT = {
         chooseHistoryFirst: "Please select or save NEWS in history before opening an active case",
         loadedFromAssessment: "Loaded data from the assessment",
         saveRequiresCase: "Please choose a NEWS history case before saving Sepsis Protocol",
+        saveRequiresDiagnosisTime: "Please enter the physician diagnosis time before saving Sepsis Protocol",
         savePending: "Sepsis Protocol saved locally. Sending to Google Sheet...",
         saveSuccess: "Sepsis Protocol saved to the sepsis sheet",
         saveError: "Saved locally, but sending to the sepsis sheet failed",
@@ -1367,7 +1369,7 @@ function normalizeSepsisCase(input = {}) {
     ...input,
     type: normalizeSepsisProtocolType(input.type || input.protocolType || base.type),
     disposition: normalizeSepsisDisposition(input.disposition || base.disposition),
-    consultDone: parseSheetBoolean(input.consultDone) || Boolean(normalizeClockTime(input.consultTime || "")),
+    consultDone: parseSheetBoolean(input.consultDone),
     consultTime: normalizeClockTime(input.consultTime || ""),
     historyRecordKey,
     caseId: input.caseId || (historyRecordKey ? `sepsis-history-${hashSepsisCaseKey(historyRecordKey)}` : ""),
@@ -1683,7 +1685,7 @@ function getTaskDateTime(step, sepsis = sepsisState) {
 }
 
 function isSepsisStepDone(step, sepsis = sepsisState) {
-  if (step === "consult") return Boolean(sepsis.consultDone || sepsis.consultTime);
+  if (step === "consult") return Boolean(sepsis.consultDone);
   return Boolean(sepsis.tasks?.[step]?.done || (!SEPSIS_CHECK_ONLY_STEPS.has(step) && getSepsisStepTime(step, sepsis)));
 }
 
@@ -1807,7 +1809,7 @@ function createSepsisSheetPayload(sepsis = sepsisState) {
     disposition: normalized.disposition || "",
     newsScore: normalized.newsScore || 0,
     newsLevel: normalized.newsLevel || "",
-    consultDone: isSepsisStepDone("consult", normalized),
+    consultDone: Boolean(normalized.consultDone),
     consultTime: normalizeClockTime(normalized.consultTime),
     bloodCultureDone: Boolean(task(1).done),
     bloodCultureTime: task(1).time || "",
@@ -2278,6 +2280,11 @@ async function saveSepsisProtocol() {
     return;
   }
 
+  if (!normalizeClockTime(sepsisState.consultTime || "")) {
+    setSepsisStatus(sepsisCopy().statuses.saveRequiresDiagnosisTime, "error");
+    return;
+  }
+
   setSepsisStatus(sepsisCopy().statuses.savePending, "info");
 
   try {
@@ -2297,12 +2304,11 @@ function setSepsisType(type) {
 }
 
 function toggleSepsisConsultTime() {
-  if (isSepsisStepDone("consult", sepsisState)) {
-    sepsisState.consultDone = false;
+  if (sepsisState.consultTime) {
     sepsisState.consultTime = "";
   } else {
-    sepsisState.consultDone = true;
-    sepsisState.consultTime = "";
+    const now = new Date();
+    sepsisState.consultTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   }
   persistSepsisState();
   renderSepsisProtocol();
@@ -2312,7 +2318,6 @@ function setSepsisTaskTime(step, value) {
   const nextValue = normalizeClockTime(value);
   if (step === "consult") {
     sepsisState.consultTime = nextValue;
-    sepsisState.consultDone = Boolean(nextValue);
     persistSepsisState();
     renderSepsisProtocol();
     return;
@@ -2333,7 +2338,9 @@ function setSepsisTaskTime(step, value) {
 
 function toggleSepsisTask(step) {
   if (step === "consult") {
-    toggleSepsisConsultTime();
+    sepsisState.consultDone = !sepsisState.consultDone;
+    persistSepsisState();
+    renderSepsisProtocol();
     return;
   }
   const task = sepsisState.tasks[step];
@@ -2500,7 +2507,7 @@ function renderSepsisProtocol() {
   if (timelineStartDateEl) timelineStartDateEl.textContent = startDate ? formatDateThai(sepsisState.startDateTime) : copy.timeline.notSet;
   if (timelineConsultTimeEl) timelineConsultTimeEl.textContent = formatTimeDisplay(sepsisState.consultTime || "");
   if (consultToggleEl) {
-    const isDone = isSepsisStepDone("consult", sepsisState);
+    const isDone = Boolean(sepsisState.consultTime);
     consultToggleEl.classList.toggle("done", isDone);
     consultToggleEl.classList.toggle("pending", !isDone);
     consultToggleEl.innerHTML = isDone ? "&#10003;" : "";
@@ -3329,6 +3336,7 @@ function applySepsisStaticTranslations() {
   setScopedText('#sepsisView [data-sepsis-triage="Non-urgency"]', "span:last-child", copy.triage.nonUrgency);
 
   setScopedText("#sepsisView .sepsis-consult-card", ".sepsis-consult-copy strong", copy.consult.title);
+  setElementAttribute("#sepsisConsultTime", "aria-label", copy.consult.toggleLabel);
   setElementAttribute("#sepsisConsultToggle", "aria-label", copy.consult.toggleLabel);
 
   const typeSection = document.querySelector('#sepsisView [data-sepsis-type]')?.closest(".sepsis-card");

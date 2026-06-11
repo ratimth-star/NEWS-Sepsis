@@ -343,7 +343,7 @@
                   <h3>5. Sepsis 6 ภายใน 1 ชั่วโมง</h3>
                 </div>
                 <div class="desktop-protocol-list">
-                  <div class="desktop-protocol-row done"><span>แจ้งแพทย์ (Time Zero)</span><strong>09:41</strong></div>
+                  <div class="desktop-protocol-row done"><span>แพทย์วินิจฉัย</span><strong>09:41</strong></div>
                   <div class="desktop-protocol-row done"><span>เจาะเลือดเพาะเชื้อ (Hemoculture)</span><strong>09:45</strong></div>
                   <div class="desktop-protocol-row done"><span>ตรวจ Lactate</span><strong>09:50</strong></div>
                   <div class="desktop-protocol-row done"><span>ให้สารน้ำ (IV fluid) 30 ml/kg</span><strong>10:00</strong></div>
@@ -1040,7 +1040,8 @@
                     <strong>แพทย์วินิจฉัย</strong>
                   </div>
                   <div class="sepsis-consult-actions">
-                    <button id="sepsisConsultToggle" class="sepsis-action-toggle pending" type="button" aria-label="บันทึกเวลาแจ้งแพทย์"></button>
+                    <input id="sepsisConsultTime" class="sepsis-time-input sepsis-consult-input" type="text" inputmode="numeric" maxlength="5" placeholder="HH:MM" aria-label="บันทึกเวลาแพทย์วินิจฉัย" />
+                    <button id="sepsisConsultToggle" class="sepsis-action-toggle pending" type="button" aria-label="บันทึกเวลาแพทย์วินิจฉัย"></button>
                   </div>
                 </div>
               </section>
@@ -1168,7 +1169,7 @@
                     <div class="sepsis-action-icon" aria-hidden="true"><img class="sepsis-asset-icon" src="icon sepsis/doctor-notify.svg" alt="" /></div>
                     <div class="sepsis-action-copy">
                       <strong>แจ้งแพทย์</strong>
-                      <span>บันทึกเวลาแจ้งแพทย์ (Time Zero)</span>
+                      <span>ติ๊กเมื่อแจ้งแพทย์แล้ว</span>
                     </div>
                     <button class="sepsis-action-toggle" type="button" data-sepsis-toggle="consult" aria-label="ทำรายการที่ 1 สำเร็จ"></button>
                   </article>
@@ -1478,11 +1479,11 @@
               </div>
               <div class="knowledge-download-list">
                 <a class="knowledge-download-link" href="https://drive.google.com/uc?export=download&id=1fPYhvke4cgrqudH9f3KbZc9wpDNVBgQF" target="_blank" rel="noopener">
-                  <span class="knowledge-download-icon" aria-hidden="true">&#8681;</span>
+                  <span class="knowledge-download-icon" aria-hidden="true"><img src="icon sepsis/Download.svg" alt="" /></span>
                   <span>แนวทางการดูแลผู้ป่วยติดเชื้อในกระแสเลือด</span>
                 </a>
                 <a class="knowledge-download-link" href="https://drive.google.com/uc?export=download&id=1pdv2OpVjzSmPVsYowOosJNB3KOw-t6C9" target="_blank" rel="noopener">
-                  <span class="knowledge-download-icon" aria-hidden="true">&#8681;</span>
+                  <span class="knowledge-download-icon" aria-hidden="true"><img src="icon sepsis/Download.svg" alt="" /></span>
                   <span>sepsis protocal cheklist in ER</span>
                 </a>
               </div>
@@ -1500,7 +1501,7 @@
                 <button id="knowledgeZoomOutBtn" class="knowledge-tool-button" type="button" title="Zoom out" aria-label="Zoom out">&#8722;</button>
                 <button id="knowledgeZoomResetBtn" class="knowledge-tool-button text-tool" type="button" title="Reset zoom" aria-label="Reset zoom">100%</button>
                 <button id="knowledgeZoomInBtn" class="knowledge-tool-button" type="button" title="Zoom in" aria-label="Zoom in">+</button>
-                <a id="knowledgeDownloadImageLink" class="knowledge-tool-button" href="#" download title="Download" aria-label="Download">&#8681;</a>
+                <a id="knowledgeDownloadImageLink" class="knowledge-tool-button" href="#" download title="Download" aria-label="Download"><img src="icon sepsis/Download.svg" alt="" /></a>
               </div>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1592,7 +1593,7 @@
             <div class="phone-shot-body">
               <div class="shot-headline">Sepsis 6 ภายใน 1 ชั่วโมง</div>
               <div class="protocol-list">
-                <div class="protocol-item done"><span>แจ้งแพทย์</span><span>09:41</span></div>
+                <div class="protocol-item done"><span>แพทย์วินิจฉัย</span><span>09:41</span></div>
                 <div class="protocol-item done"><span>เจาะเลือดเพาะเชื้อ</span><span>09:45</span></div>
                 <div class="protocol-item done"><span>ตรวจ Lactate</span><span>09:50</span></div>
                 <div class="protocol-item done"><span>ให้สารน้ำ (IV fluid)</span><span>10:00</span></div>
@@ -1620,7 +1621,7 @@
                 <div class="mock-field"><span>วันที่/เวลาคัดกรอง</span><strong>26 เม.ย. 2569 09:41</strong></div>
                 <div class="mock-field danger"><span>คะแนน NEWS</span><strong>14 (เสี่ยงสูง)</strong></div>
                 <div class="mock-split">
-                  <div class="mock-field"><span>Time Zero</span><strong>09:41</strong></div>
+                  <div class="mock-field"><span>แพทย์วินิจฉัย</span><strong>09:41</strong></div>
                   <div class="mock-field"><span>เวลาให้ ATB</span><strong>10:15</strong></div>
                 </div>
                 <div class="mock-field"><span>ผู้บันทึก</span><strong>พยาบาลเวร ER</strong></div>
