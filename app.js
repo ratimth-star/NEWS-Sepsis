@@ -6065,10 +6065,14 @@ function getSepsisCaseProgressCounts(item = {}) {
   return { completedSteps, totalSteps };
 }
 
+function hasSepsisDispositionSelected(item = {}) {
+  return Boolean(normalizeSepsisDisposition(item.disposition || "").trim());
+}
+
 function renderHomeSepsisCaseRow(item) {
   const copy = sepsisCopy();
   const progress = getSepsisCaseProgressCounts(item);
-  const isComplete = progress.completedSteps >= progress.totalSteps;
+  const isComplete = hasSepsisDispositionSelected(item);
   const timeText = getSepsisCaseSubtitle(item);
   const statusText = isComplete ? copy.currentCase.statusComplete : copy.currentCase.statusWorking;
   const progressText = `${progress.completedSteps}/${progress.totalSteps}`;
