@@ -6,12 +6,13 @@ const NEWS_REQUIRED_NAV_KEY = "suandok-news-required-nav-v1";
 const HISTORY_FETCH_LIMIT = 100;
 const HOME_SEPSIS_CASE_LIMIT = 5;
 const SEPSIS_PROTOCOL_KEY = "suandok-sepsis-protocol-v1";
+const SEPSIS_DELETED_CASES_KEY = "suandok-sepsis-deleted-cases-v1";
 const SEPSIS_PROGRESS_TASKS = ["consult", 1, 4, 3, 2, 6, 5, 7];
 const SEPSIS_CHECK_ONLY_STEPS = new Set(["consult", 2, 3, 7]);
 const SEPSIS_SHARED_TIME_STEPS = new Map([[4, 1]]);
 const SMART_EVALUATION_KEY = "smart-sepsis-app-evaluation-v1";
 const SATISFACTION_SHEET_NAME = "Satisfaction Assessment Form";
-const APP_VERSION = "20260616-treatment-time-reference";
+const APP_VERSION = "20260617-dashboard-antibiotic-time-only";
 const SMART_EVALUATION_QUESTIONS = [
   "รูปแบบหน้าจอมีความสวยงามและน่าสนใจ",
   "เมนูและฟังก์ชันต่าง ๆ เข้าใจง่าย",
@@ -1327,6 +1328,44 @@ function getSepsisCaseIdFromHistory(item = {}) {
   return key ? `sepsis-history-${hashSepsisCaseKey(key)}` : "";
 }
 
+function readDeletedSepsisCaseKeys() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(SEPSIS_DELETED_CASES_KEY) || "[]");
+    return new Set(Array.isArray(parsed) ? parsed.filter(Boolean) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function writeDeletedSepsisCaseKeys(keys) {
+  localStorage.setItem(SEPSIS_DELETED_CASES_KEY, JSON.stringify(Array.from(keys).filter(Boolean).slice(-300)));
+}
+
+function getSepsisDeletionKeys(sepsis = {}) {
+  const normalized = normalizeSepsisCase(sepsis || {});
+  return [
+    normalized.caseId ? `case:${normalized.caseId}` : "",
+    normalized.historyRecordKey ? `history:${normalized.historyRecordKey}` : ""
+  ].filter(Boolean);
+}
+
+function isSepsisCaseDeleted(sepsis = {}) {
+  const deletedKeys = readDeletedSepsisCaseKeys();
+  return getSepsisDeletionKeys(sepsis).some(key => deletedKeys.has(key));
+}
+
+function rememberDeletedSepsisCase(sepsis = {}) {
+  const deletedKeys = readDeletedSepsisCaseKeys();
+  getSepsisDeletionKeys(sepsis).forEach(key => deletedKeys.add(key));
+  writeDeletedSepsisCaseKeys(deletedKeys);
+}
+
+function forgetDeletedSepsisCase(sepsis = {}) {
+  const deletedKeys = readDeletedSepsisCaseKeys();
+  getSepsisDeletionKeys(sepsis).forEach(key => deletedKeys.delete(key));
+  writeDeletedSepsisCaseKeys(deletedKeys);
+}
+
 function normalizeSepsisProtocolType(value = "") {
   const normalized = String(value || "").trim().toLowerCase().replace(/[_-]+/g, " ");
   if (["septic shock", "shock", "severe", "severe sepsis", "severe sepsis septic shock", "severe sepsis/shock"].includes(normalized)) {
@@ -1688,7 +1727,7 @@ function getTaskDateTime(step, sepsis = sepsisState) {
 }
 
 function getSepsisTreatmentReferenceDate(sepsis = sepsisState) {
-  return [5, 6]
+  return [6]
     .map(step => getTaskDateTime(step, sepsis))
     .filter(date => date && !Number.isNaN(date.getTime()))
     .sort((a, b) => b.getTime() - a.getTime())[0] || null;
@@ -1798,7 +1837,7 @@ function createSepsisSheetPayload(sepsis = sepsisState) {
     const current = normalized.tasks?.[step] || { done: false, time: "" };
     return { ...current, time: normalizeClockTime(current.time || "") };
   };
-  const completedAll = metrics.completedSteps === SEPSIS_PROGRESS_TASKS.length;
+  const completedAll = isSepsisCaseComplete(normalized);
 
   return {
     sheetName: "sepsis",
@@ -1946,20 +1985,21 @@ function getSepsisCaseSubtitle(sepsis) {
 function getSepsisCaseStatusText(sepsis) {
   const copy = sepsisCopy().currentCase;
   const metrics = calculateSepsisMetricsForCase(sepsis);
-  if (metrics.completedSteps === SEPSIS_PROGRESS_TASKS.length) return copy.statusComplete;
+  if (isSepsisCaseComplete(sepsis)) return copy.statusComplete;
   if (metrics.remainingMinutes < 0) return copy.statusOver;
   return copy.statusWorking;
 }
 
-function isSepsisCaseComplete(sepsis) {
-  const savedCompletedSteps = Number.parseInt(sepsis?.completedSteps ?? "", 10);
-  const savedTotalSteps = Number.parseInt(sepsis?.totalSteps ?? SEPSIS_PROGRESS_TASKS.length, 10);
-  if (!Number.isNaN(savedCompletedSteps) && !Number.isNaN(savedTotalSteps) && savedCompletedSteps >= savedTotalSteps) {
-    return true;
-  }
+function hasSepsisDispositionSelected(item = {}) {
+  return Boolean(normalizeSepsisDisposition(item.disposition || "").trim());
+}
 
-  const metrics = calculateSepsisMetricsForCase(sepsis);
-  return metrics.completedSteps >= SEPSIS_PROGRESS_TASKS.length;
+function hasSepsisAntibioticCompleted(sepsis = {}) {
+  return isSepsisStepDone(6, normalizeSepsisCase(sepsis || {}));
+}
+
+function isSepsisCaseComplete(sepsis = {}) {
+  return hasSepsisAntibioticCompleted(sepsis) && hasSepsisDispositionSelected(sepsis);
 }
 
 function getSepsisCaseSortTime(sepsis = {}) {
@@ -1967,20 +2007,54 @@ function getSepsisCaseSortTime(sepsis = {}) {
   return parseFlexibleDateTime(rawValue) || 0;
 }
 
+function getSepsisCaseMergeKeys(sepsis = {}) {
+  const normalized = normalizeSepsisCase(sepsis || {});
+  const patientHn = sanitizeHN(normalized.patientHn || normalized.hn || "");
+  const startTime = normalized.startDateTime || normalized.assessmentTime || "";
+  return [
+    normalized.caseId ? `case:${normalized.caseId}` : "",
+    normalized.historyRecordKey ? `history:${normalized.historyRecordKey}` : "",
+    patientHn && startTime ? `patient:${patientHn}|${startTime}` : ""
+  ].filter(Boolean);
+}
+
+function getSepsisCaseCompletenessScore(sepsis = {}) {
+  const metrics = calculateSepsisMetricsForCase(sepsis);
+  const taskTimes = Object.values(sepsis.tasks || {}).filter(task => task?.time).length;
+  return (metrics.completedSteps * 10) + taskTimes;
+}
+
+function choosePreferredSepsisCase(currentCase, nextCase) {
+  const currentSortTime = getSepsisCaseSortTime(currentCase);
+  const nextSortTime = getSepsisCaseSortTime(nextCase);
+  if (nextSortTime !== currentSortTime) return nextSortTime > currentSortTime ? nextCase : currentCase;
+  return getSepsisCaseCompletenessScore(nextCase) >= getSepsisCaseCompletenessScore(currentCase) ? nextCase : currentCase;
+}
+
 function mergeSepsisCases(cases = []) {
-  const caseMap = new Map();
+  const mergedCases = [];
+  const keyMap = new Map();
   cases.map(normalizeSepsisCase).forEach(item => {
     if (!item.caseId) return;
-    const previous = caseMap.get(item.caseId);
-    if (!previous || getSepsisCaseSortTime(item) >= getSepsisCaseSortTime(previous)) {
-      caseMap.set(item.caseId, item);
+    const keys = getSepsisCaseMergeKeys(item);
+    const existingIndex = keys.map(key => keyMap.get(key)).find(index => index !== undefined);
+
+    if (existingIndex === undefined) {
+      const nextIndex = mergedCases.length;
+      mergedCases.push(item);
+      keys.forEach(key => keyMap.set(key, nextIndex));
+      return;
     }
+
+    const preferredCase = choosePreferredSepsisCase(mergedCases[existingIndex], item);
+    mergedCases[existingIndex] = preferredCase;
+    getSepsisCaseMergeKeys(preferredCase).forEach(key => keyMap.set(key, existingIndex));
   });
-  return Array.from(caseMap.values()).sort((a, b) => getSepsisCaseSortTime(b) - getSepsisCaseSortTime(a));
+  return mergedCases.sort((a, b) => getSepsisCaseSortTime(b) - getSepsisCaseSortTime(a));
 }
 
 function persistSepsisStoreWithCases(cases = sepsisStore.cases) {
-  const mergedCases = mergeSepsisCases(cases);
+  const mergedCases = mergeSepsisCases(cases).filter(item => !isSepsisCaseDeleted(item));
   const activeCaseId = mergedCases.some(item => item.caseId === sepsisStore.activeCaseId)
     ? sepsisStore.activeCaseId
     : "";
@@ -2164,6 +2238,7 @@ function deleteSepsisCase(caseId) {
   if (!confirmed) return;
 
   window.clearTimeout(sepsisSheetSyncTimer);
+  rememberDeletedSepsisCase(targetCase);
   deleteSepsisCaseFromSheet(targetCase);
   sepsisStore.cases = sepsisStore.cases.filter(item => item.caseId !== caseId);
 
@@ -2507,7 +2582,7 @@ function renderSepsisProtocol() {
   if (ringEl) {
     ringEl.style.background = `conic-gradient(#10a4bb 0 ${metrics.progressPercent}%, #dce8ef ${metrics.progressPercent}% 100%)`;
   }
-  if (completionTitleEl) completionTitleEl.textContent = metrics.completedSteps === SEPSIS_PROGRESS_TASKS.length ? copy.progress.complete : copy.progress.inProgress;
+  if (completionTitleEl) completionTitleEl.textContent = isSepsisCaseComplete(sepsisState) ? copy.progress.complete : copy.progress.inProgress;
   if (completionTextEl) completionTextEl.textContent = formatTemplate(copy.progress.completion, { done: metrics.completedSteps, total: SEPSIS_PROGRESS_TASKS.length });
   if (noteInputEl && noteInputEl.value !== sepsisState.note) {
     noteInputEl.value = sepsisState.note || "";
@@ -3971,7 +4046,14 @@ function createSepsisCaseFromHistoryItem(item = {}, existingCase = null) {
 function syncSepsisCasesWithHistory(options = {}) {
   const { preferredHistoryItem = null } = options;
   const historyItems = getHistoryLookupItems();
-  const previousCases = Array.isArray(sepsisStore.cases) ? sepsisStore.cases.map(normalizeSepsisCase) : [];
+  const preferredCaseId = preferredHistoryItem ? getSepsisCaseIdFromHistory(preferredHistoryItem) : "";
+  if (preferredHistoryItem) {
+    const preferredCase = createSepsisCaseFromHistoryItem(preferredHistoryItem);
+    if (preferredCase) forgetDeletedSepsisCase(preferredCase);
+  }
+  const previousCases = Array.isArray(sepsisStore.cases)
+    ? sepsisStore.cases.map(normalizeSepsisCase).filter(item => item.caseId === preferredCaseId || !isSepsisCaseDeleted(item))
+    : [];
   const historyByCaseId = new Map();
   const historyByKey = new Map();
   const nextCases = [];
@@ -3997,6 +4079,7 @@ function syncSepsisCasesWithHistory(options = {}) {
     if (seenCaseIds.has(getSepsisCaseIdFromHistory(matchedHistoryItem))) return;
     const nextCase = createSepsisCaseFromHistoryItem(matchedHistoryItem, existingCase);
     if (!nextCase) return;
+    if (nextCase.caseId !== preferredCaseId && isSepsisCaseDeleted(nextCase)) return;
     seenCaseIds.add(nextCase.caseId);
     nextCases.push(nextCase);
   });
@@ -4006,13 +4089,13 @@ function syncSepsisCasesWithHistory(options = {}) {
     if (preferredCaseId && !seenCaseIds.has(preferredCaseId)) {
       const nextCase = createSepsisCaseFromHistoryItem(preferredHistoryItem);
       if (nextCase) {
+        forgetDeletedSepsisCase(nextCase);
         seenCaseIds.add(nextCase.caseId);
         nextCases.unshift(nextCase);
       }
     }
   }
 
-  const preferredCaseId = preferredHistoryItem ? getSepsisCaseIdFromHistory(preferredHistoryItem) : "";
   const previousActiveId = sepsisStore.activeCaseId || sepsisState.caseId || "";
   const activeCaseId = nextCases.some(item => item.caseId === preferredCaseId)
     ? preferredCaseId
@@ -4209,8 +4292,9 @@ function normalizeDashboardSepsisItem(item = {}, historyMaps = getDashboardHisto
   const resolvedCompletedSteps = Number.isNaN(completedSteps) ? metrics.completedSteps : completedSteps;
   const resolvedTotalSteps = Number.isNaN(totalSteps) ? SEPSIS_PROGRESS_TASKS.length : totalSteps;
   const resolvedRemainingMinutes = metrics.remainingMinutes;
-  const overTarget = resolvedRemainingMinutes < 0 && resolvedCompletedSteps < resolvedTotalSteps;
-  const onTime = resolvedCompletedSteps >= resolvedTotalSteps && resolvedRemainingMinutes >= 0;
+  const isComplete = isSepsisCaseComplete(normalized);
+  const overTarget = resolvedRemainingMinutes < 0 && !isComplete;
+  const onTime = isComplete && resolvedRemainingMinutes >= 0;
 
   return {
     ...normalized,
@@ -4276,6 +4360,14 @@ function filterDashboardSepsisItems(items, filters = getDashboardFilters()) {
     const matchesLocation = !filters.location || String(item.assessmentLocation || "").trim() === filters.location;
     return matchesDate && matchesLocation;
   });
+}
+
+function filterCompletedDashboardSepsisItems(items = []) {
+  return items.filter(item => Boolean(getSepsisStepTime(6, item)));
+}
+
+function getDashboardSepsisNewsScore(item = {}) {
+  return Number.parseInt(item.newsScore ?? item.score ?? 0, 10) || 0;
 }
 
 function setDashboardText(id, value) {
@@ -5017,18 +5109,18 @@ function renderDashboard() {
   const dashboardCopy = pageText().dashboard;
   const allHistoryItems = getDashboardHistoryItems();
   const allSepsisItems = getDashboardSepsisItems();
-  populateDashboardLocationOptions(allHistoryItems, allSepsisItems);
+  const allCompletedSepsisItems = filterCompletedDashboardSepsisItems(allSepsisItems);
+  populateDashboardLocationOptions(allHistoryItems, allCompletedSepsisItems);
 
   const filters = getDashboardFilters();
   const historyItems = filterDashboardHistoryItems(allHistoryItems, filters);
-  const sepsisItems = filterDashboardSepsisItems(allSepsisItems, filters);
-  const suspectedItems = historyItems.filter(item => isPositiveInfectionSource(item.infectionSource) && (item.score >= 5 || item.red));
+  const sepsisItems = filterDashboardSepsisItems(allCompletedSepsisItems, filters);
   const standardSepsisItems = sepsisItems.filter(item => item.type !== "severe");
   const severeSepsisItems = sepsisItems.filter(item => item.type === "severe");
   const atb3hStats = getDashboardAtbWithinMinutesStats(standardSepsisItems, 180);
   const severeAtb1hStats = getDashboardAtbWithinMinutesStats(severeSepsisItems, 60);
 
-  setDashboardText("dashboardSummarySepsisCount", String(sepsisItems.length || suspectedItems.length));
+  setDashboardText("dashboardSummarySepsisCount", String(sepsisItems.length));
   setDashboardText("dashboardSummaryAtb3hCount", formatDashboardAtbCountValue(atb3hStats));
   setDashboardText("dashboardSummaryAtb3hHint", formatDashboardAtbRatioHint(atb3hStats));
   setDashboardText("dashboardSummarySevereAtbRate", formatDashboardAtbCountValue(severeAtb1hStats));
@@ -5036,13 +5128,13 @@ function renderDashboard() {
   renderDashboardSourceRow(sepsisItems);
 
   renderDashboardBarList("dashboardRiskBars", [
-    { label: dashboardCopy.riskLow, value: historyItems.filter(item => item.score <= 4 && !item.red).length, theme: "low" },
-    { label: dashboardCopy.riskWatch, value: historyItems.filter(item => item.score >= 5 && item.score <= 6 && !item.red).length, theme: "watch" },
-    { label: dashboardCopy.riskHigh, value: historyItems.filter(item => item.score >= 7 && item.score <= 12 && !item.red).length, theme: "high" },
-    { label: "≥13 / RED", value: historyItems.filter(item => item.score >= 13 || item.red).length, theme: "danger" }
+    { label: dashboardCopy.riskLow, value: sepsisItems.filter(item => getDashboardSepsisNewsScore(item) <= 4).length, theme: "low" },
+    { label: dashboardCopy.riskWatch, value: sepsisItems.filter(item => getDashboardSepsisNewsScore(item) >= 5 && getDashboardSepsisNewsScore(item) <= 6).length, theme: "watch" },
+    { label: dashboardCopy.riskHigh, value: sepsisItems.filter(item => getDashboardSepsisNewsScore(item) >= 7 && getDashboardSepsisNewsScore(item) <= 12).length, theme: "high" },
+    { label: "≥13 / RED", value: sepsisItems.filter(item => getDashboardSepsisNewsScore(item) >= 13).length, theme: "danger" }
   ]);
 
-  renderDashboardTrendChart(historyItems, sepsisItems);
+  renderDashboardTrendChart([], sepsisItems);
   renderDashboardKpiList(sepsisItems, historyItems);
 
   if (selectors.dashboardStatus) {
@@ -5103,6 +5195,7 @@ function openSepsisCaseState(nextCase) {
   const normalized = normalizeSepsisCase(nextCase);
   if (!normalized.caseId) return false;
 
+  forgetDeletedSepsisCase(normalized);
   const caseIndex = sepsisStore.cases.findIndex(item => item.caseId === normalized.caseId);
   if (caseIndex === -1) {
     sepsisStore.cases.unshift(normalized);
@@ -5911,7 +6004,7 @@ function clearHistory() {
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js?v=20260616-treatment-time-reference").catch(console.error);
+    navigator.serviceWorker.register("./service-worker.js?v=20260617-dashboard-antibiotic-time-only").catch(console.error);
     });
   }
 }
@@ -6073,14 +6166,10 @@ function getSepsisCaseProgressCounts(item = {}) {
   return { completedSteps, totalSteps };
 }
 
-function hasSepsisDispositionSelected(item = {}) {
-  return Boolean(normalizeSepsisDisposition(item.disposition || "").trim());
-}
-
 function renderHomeSepsisCaseRow(item) {
   const copy = sepsisCopy();
   const progress = getSepsisCaseProgressCounts(item);
-  const isComplete = hasSepsisDispositionSelected(item);
+  const isComplete = isSepsisCaseComplete(item);
   const timeText = getSepsisCaseSubtitle(item);
   const statusText = isComplete ? copy.currentCase.statusComplete : copy.currentCase.statusWorking;
   const progressText = `${progress.completedSteps}/${progress.totalSteps}`;

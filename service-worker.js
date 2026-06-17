@@ -1,9 +1,9 @@
-const CACHE_NAME = 'news-pwa-v105-treatment-time-reference';
+const CACHE_NAME = 'news-pwa-v113-dashboard-antibiotic-time-only';
 const ASSETS = [
   './',
   './index.html',
-  './styles.css?v=20260616-treatment-time-reference',
-  './app.js?v=20260616-treatment-time-reference',
+  './styles.css?v=20260617-dashboard-antibiotic-time-only',
+  './app.js?v=20260617-dashboard-antibiotic-time-only',
   './manifest.json',
   './icons/GJMC_logo.png',
   './icons/icon-192.png',
