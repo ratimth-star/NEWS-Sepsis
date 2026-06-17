@@ -11,7 +11,7 @@ const SEPSIS_CHECK_ONLY_STEPS = new Set(["consult", 2, 3, 7]);
 const SEPSIS_SHARED_TIME_STEPS = new Map([[4, 1]]);
 const SMART_EVALUATION_KEY = "smart-sepsis-app-evaluation-v1";
 const SATISFACTION_SHEET_NAME = "Satisfaction Assessment Form";
-const APP_VERSION = "20260610-readable-type-cache-fix";
+const APP_VERSION = "20260616-treatment-time-reference";
 const SMART_EVALUATION_QUESTIONS = [
   "รูปแบบหน้าจอมีความสวยงามและน่าสนใจ",
   "เมนูและฟังก์ชันต่าง ๆ เข้าใจง่าย",
@@ -1687,6 +1687,13 @@ function getTaskDateTime(step, sepsis = sepsisState) {
   return getDateTimeFromStartAndTime(start, time);
 }
 
+function getSepsisTreatmentReferenceDate(sepsis = sepsisState) {
+  return [5, 6]
+    .map(step => getTaskDateTime(step, sepsis))
+    .filter(date => date && !Number.isNaN(date.getTime()))
+    .sort((a, b) => b.getTime() - a.getTime())[0] || null;
+}
+
 function isSepsisStepDone(step, sepsis = sepsisState) {
   if (step === "consult") return Boolean(sepsis.consultDone);
   return Boolean(sepsis.tasks?.[step]?.done || (!SEPSIS_CHECK_ONLY_STEPS.has(step) && getSepsisStepTime(step, sepsis)));
@@ -1753,7 +1760,8 @@ function calculateSepsisMetrics() {
   const completedSteps = SEPSIS_PROGRESS_TASKS.filter(step => isSepsisStepDone(step, sepsisState)).length;
   const progressPercent = Math.round((completedSteps / SEPSIS_PROGRESS_TASKS.length) * 100);
   const start = getStartDate();
-  const elapsedMinutes = start ? Math.max(0, Math.round((Date.now() - start.getTime()) / 60000)) : 0;
+  const referenceDate = getSepsisTreatmentReferenceDate() || new Date();
+  const elapsedMinutes = start ? Math.max(0, Math.round((referenceDate.getTime() - start.getTime()) / 60000)) : 0;
   const targetMinutes = getSepsisTargetMinutes(sepsisState.type);
   const remainingMinutes = start ? targetMinutes - elapsedMinutes : targetMinutes;
   return {
@@ -1769,7 +1777,8 @@ function calculateSepsisMetricsForCase(sepsis) {
   const completedSteps = SEPSIS_PROGRESS_TASKS.filter(step => isSepsisStepDone(step, sepsis)).length;
   const progressPercent = Math.round((completedSteps / SEPSIS_PROGRESS_TASKS.length) * 100);
   const start = getStartDate(sepsis);
-  const elapsedMinutes = start ? Math.max(0, Math.round((Date.now() - start.getTime()) / 60000)) : 0;
+  const referenceDate = getSepsisTreatmentReferenceDate(sepsis) || new Date();
+  const elapsedMinutes = start ? Math.max(0, Math.round((referenceDate.getTime() - start.getTime()) / 60000)) : 0;
   const targetMinutes = getSepsisTargetMinutes(sepsis.type);
   const remainingMinutes = start ? targetMinutes - elapsedMinutes : targetMinutes;
   return {
@@ -4197,12 +4206,11 @@ function normalizeDashboardSepsisItem(item = {}, historyMaps = getDashboardHisto
   const completedSteps = Number.parseInt(item.completedSteps ?? metrics.completedSteps, 10);
   const totalSteps = Number.parseInt(item.totalSteps ?? SEPSIS_PROGRESS_TASKS.length, 10);
   const progressPercent = Number.parseInt(item.progressPercent ?? metrics.progressPercent, 10);
-  const remainingMinutes = Number.parseInt(item.remainingMinutes ?? metrics.remainingMinutes, 10);
   const resolvedCompletedSteps = Number.isNaN(completedSteps) ? metrics.completedSteps : completedSteps;
   const resolvedTotalSteps = Number.isNaN(totalSteps) ? SEPSIS_PROGRESS_TASKS.length : totalSteps;
-  const resolvedRemainingMinutes = Number.isNaN(remainingMinutes) ? metrics.remainingMinutes : remainingMinutes;
-  const overTarget = parseSheetBoolean(item.overTarget) || (resolvedRemainingMinutes < 0 && resolvedCompletedSteps < resolvedTotalSteps);
-  const onTime = parseSheetBoolean(item.onTime) || (resolvedCompletedSteps >= resolvedTotalSteps && resolvedRemainingMinutes >= 0);
+  const resolvedRemainingMinutes = metrics.remainingMinutes;
+  const overTarget = resolvedRemainingMinutes < 0 && resolvedCompletedSteps < resolvedTotalSteps;
+  const onTime = resolvedCompletedSteps >= resolvedTotalSteps && resolvedRemainingMinutes >= 0;
 
   return {
     ...normalized,
@@ -4210,7 +4218,7 @@ function normalizeDashboardSepsisItem(item = {}, historyMaps = getDashboardHisto
     totalSteps: resolvedTotalSteps,
     progressPercent: Number.isNaN(progressPercent) ? metrics.progressPercent : progressPercent,
     targetMinutes: Number.parseInt(item.targetMinutes ?? metrics.targetMinutes, 10) || metrics.targetMinutes,
-    elapsedMinutes: Number.parseInt(item.elapsedMinutes ?? metrics.elapsedMinutes, 10) || metrics.elapsedMinutes,
+    elapsedMinutes: metrics.elapsedMinutes,
     remainingMinutes: resolvedRemainingMinutes,
     overTarget,
     onTime,
@@ -5903,7 +5911,7 @@ function clearHistory() {
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js?v=20260610-readable-type-cache-fix").catch(console.error);
+    navigator.serviceWorker.register("./service-worker.js?v=20260616-treatment-time-reference").catch(console.error);
     });
   }
 }

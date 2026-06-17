@@ -1,9 +1,9 @@
-const CACHE_NAME = 'news-pwa-v104-nav-order';
+const CACHE_NAME = 'news-pwa-v105-treatment-time-reference';
 const ASSETS = [
   './',
   './index.html',
-  './styles.css?v=20260610-readable-type-cache-fix',
-  './app.js?v=20260610-readable-type-cache-fix',
+  './styles.css?v=20260616-treatment-time-reference',
+  './app.js?v=20260616-treatment-time-reference',
   './manifest.json',
   './icons/GJMC_logo.png',
   './icons/icon-192.png',
